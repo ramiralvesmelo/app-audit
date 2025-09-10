@@ -40,7 +40,7 @@ env:
   # Docker Hub (VARIÁVELS DE AMBIENTE DEFINIDA COMO SECRET)
   DOCKERHUB_REGISTRY: docker.io
   DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-  DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+  DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
   DOCKERHUB_IMAGE: ramiralvesmelo/app-audit
 
 jobs:
@@ -163,7 +163,7 @@ jobs:
         with:
           registry: ${{ env.DOCKERHUB_REGISTRY }}
           username: ${{ env.DOCKERHUB_USERNAME }}
-          password: ${{ env.DOCKERHUB_PASSWORD }}
+          password: ${{ env.DOCKERHUB_TOKEN }}
 
       - name: "🏷️ Metadados da imagem (tags/labels)"
         id: meta
