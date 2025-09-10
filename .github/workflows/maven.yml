@@ -32,7 +32,7 @@ jobs:
       MAVEN_USERNAME: ramiralvesmelo
       MAVEN_PASSWORD: ${{ secrets.GH_PACKAGES_TOKEN }}      
       SONAR_ORG: ramiralvesmelo
-      SONAR_PROJECT_KEY: ramiralvesmelo_app-demo      
+      SONAR_PROJECT_KEY: ramiralvesmelo_app-audit      
 
     steps:
       - name: "📥 Checkout do repositório"
@@ -133,6 +133,7 @@ jobs:
       IMAGE_NAME: ${{ github.repository }}
       MAVEN_USERNAME: ramiralvesmelo      
       MAVEN_PASSWORD: ${{ secrets.GH_PACKAGES_TOKEN }}  # PAT classic com read:packages (e repo se privado)
+      DOCKERHUB_IMAGE: ramiralvesmelo/app-audit
       
     steps:
       - name: "📥 Checkout"
@@ -154,7 +155,7 @@ jobs:
         with:
           images: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-            ramiralvesmelo/app-demo
+            ${{ env.DOCKERHUB_IMAGE }}
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=sha,format=short,prefix=sha-
