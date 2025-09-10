@@ -133,7 +133,7 @@ jobs:
       IMAGE_NAME: ${{ github.repository }}
       MAVEN_USERNAME: ramiralvesmelo      
       MAVEN_PASSWORD: ${{ secrets.GH_PACKAGES_TOKEN }}  # PAT classic com read:packages (e repo se privado)
-      DOCKERHUB_IMAGE: ramiralvesmelo/app-audit
+      #DOCKERHUB_IMAGE: ramiralvesmelo/app-audit
       
     steps:
       - name: "📥 Checkout"
