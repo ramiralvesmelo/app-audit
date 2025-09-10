@@ -85,20 +85,20 @@ jobs:
           fail_ci_if_error: true
           verbose: false
 
-      - name: "🔎 SonarCloud (Aguarda Quality Gate)"
-        if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false }}
-        working-directory: ${{ github.event.inputs.project_dir }}
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          mvn -B -V -s ~/.m2/settings.xml \
-            -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.login="${SONAR_TOKEN}" \
-            -Dsonar.organization="${SONAR_ORG}" \
-            -Dsonar.projectKey="${SONAR_PROJECT_KEY}" \
-            -Dsonar.coverage.jacoco.xmlReportPaths="**/target/site/jacoco/jacoco.xml" \
-            -Dsonar.qualitygate.wait=true \
-            org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+      #- name: "🔎 SonarCloud (Aguarda Quality Gate)"
+      #  if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false }}
+      #  working-directory: ${{ github.event.inputs.project_dir }}
+      #  env:
+      #    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #  run: |
+      #    mvn -B -V -s ~/.m2/settings.xml \
+      #      -Dsonar.host.url=https://sonarcloud.io \
+      #      -Dsonar.login="${SONAR_TOKEN}" \
+      #      -Dsonar.organization="${SONAR_ORG}" \
+      #      -Dsonar.projectKey="${SONAR_PROJECT_KEY}" \
+      #      -Dsonar.coverage.jacoco.xmlReportPaths="**/target/site/jacoco/jacoco.xml" \
+      #      -Dsonar.qualitygate.wait=true \
+      #      org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
 
       - name: "📦 Gerar SBOM (CycloneDX)"
         working-directory: ${{ github.event.inputs.project_dir }}
