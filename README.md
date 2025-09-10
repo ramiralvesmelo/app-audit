@@ -127,31 +127,31 @@ Essa propriedade é preenchida automaticamente pelo **plugin JaCoCo** durante a 
 
 ```bash
 # Build via Power Shell
-$env:DOCKER_BUILDKIT = "1"
-$env:MAVEN_USERNAME  = "ramiralvesmelo"
+$env:DOCKER_BUILDKIT  = "1"
+$env:MAVEN_USERNAME   = "ramiralvesmelo"
 # Token de acesso com grant pra leitura
-$env:MAVEN_PASSWORD  = "GH_PACKAGES_TOKEN"
-$settings = "infra/docker/maven-settings.xml"
+$env:MAVEN_PASSWORD   = "GH_PACKAGES_TOKEN"
+$settings             = "infra/docker/maven-settings.xml"
 
 docker build `
   -f infra/docker/Dockerfile `
   --secret id=maven_settings,src="$settings" `
-  -t app-demo:4.0.0 .
+  -t app-audit:1.0.0 .
 
 # Executar container
-docker run --rm -p 8080:8080 app-audit:4.0.0
+docker run --rm -p 8080:8080 app-audit:1.0.0
 
 # Executar com config externa (mapeando a pasta local para /config no container)
 docker run --rm -p 8080:8080 \
   -v $(pwd)/infra/docker/config:/config:ro \
   -e SPRING_CONFIG_LOCATION=file:/config/application.properties \
-  app-audit:2.2.2
+  app-audit:1.0.0
 
 # Windows PowerShell (ajuste o caminho conforme seu projeto):
 docker run --rm -p 8080:8080 `
   -v ${PWD}\infra\docker\config:/config:ro `
   -e SPRING_CONFIG_LOCATION=file:/config/application.properties `
-  app-audit:2.2.2
+  app-audit:1.0.0
 ```
 
 ---
