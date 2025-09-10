@@ -16,6 +16,28 @@ permissions:
   contents: read
   packages: write
 
+# 🔝 Escopo MAIOR (workflow-level)
+env:
+  # Reutilizáveis
+  JAVA_VERSION: "24"
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  DOCKER_PLATFORMS: linux/amd64
+
+  # Maven (padrão: usar o ator que executa o workflow)
+  MAVEN_USERNAME: ${{ github.actor }}
+  MAVEN_PASSWORD: ${{ secrets.GH_PACKAGES_TOKEN }}
+  MAVEN_SERVER_ID: github-ramir-util
+
+  # Qualidade / Telemetria
+  SONAR_ORG: ramiralvesmelo
+  SONAR_PROJECT_KEY: ramiralvesmelo_app-audit
+  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  # Inputs do dispatch (disponíveis globalmente)
+  PROJECT_DIR: ${{ github.event.inputs.project_dir }}
+  MODULE_GAV: ${{ github.event.inputs.module_gav }}
+
 jobs:
 
   ci:
@@ -24,32 +46,26 @@ jobs:
     permissions:
       contents: write
       packages: write
-    env:
-      MAVEN_USERNAME: ramiralvesmelo
-      MAVEN_PASSWORD: ${{ secrets.GH_PACKAGES_TOKEN }}      
-      SONAR_ORG: ramiralvesmelo
-      SONAR_PROJECT_KEY: ramiralvesmelo_app-audit      
-
+    # Caso precise sobrescrever algo aqui, use 'env:' no job
     steps:
       - name: "📥 Checkout do repositório"
         uses: actions/checkout@v4
 
-      - name: 🧹 Remover jacocoArgLine vazio do pom.xml
+      - name: "🧹 Remover jacocoArgLine vazio do pom.xml"
         run: |
           sed -i 's|<jacocoArgLine></jacocoArgLine>||g' pom.xml
-          echo "✅ jacocoArgLine removido do pom.xml"              
+          echo "✅ jacocoArgLine removido do pom.xml"
 
-      - name: "⚙️ JDK 24 + cache Maven + credencial (read via PAT)"
+      - name: "⚙️ JDK ${ { env.JAVA_VERSION } } + cache Maven + credencial"
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: "24"
+          java-version: ${{ env.JAVA_VERSION }}
           cache: maven
           check-latest: true
-          # Gera ~/.m2/settings.xml automaticamente com <servers>
-          server-id: github-ramir-util             
-          server-username: MAVEN_USERNAME          
-          server-password: MAVEN_PASSWORD          
+          server-id: ${{ env.MAVEN_SERVER_ID }}
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
 
       - name: "🔎 Verificar Versão Java | Maven"
         run: |
@@ -59,11 +75,11 @@ jobs:
           sed 's|<password>.*</password>|<password>***</password>|' ~/.m2/settings.xml | head -n 40
 
       - name: "🛠️ Build + Test + Coverage (jacoco.xml)"
-        working-directory: ${{ github.event.inputs.project_dir }}
+        working-directory: ${{ env.PROJECT_DIR }}
         run: |
           set -e
-          if [ -n "${{ github.event.inputs.module_gav }}" ]; then
-            mvn -B -V -s ~/.m2/settings.xml -DskipTests=false clean verify -am -pl "${{ github.event.inputs.module_gav }}"
+          if [ -n "${MODULE_GAV}" ]; then
+            mvn -B -V -s ~/.m2/settings.xml -DskipTests=false clean verify -am -pl "${MODULE_GAV}"
           else
             mvn -B -V -s ~/.m2/settings.xml -DskipTests=false clean verify
           fi
@@ -75,29 +91,29 @@ jobs:
         if: ${{ !cancelled() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false) }}
         uses: codecov/codecov-action@v4
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          token: ${{ env.CODECOV_TOKEN }}
           files: "**/target/site/jacoco/jacoco.xml"
           slug: ${{ github.repository }}
           fail_ci_if_error: true
           verbose: false
 
-      #- name: "🔎 SonarCloud (Aguarda Quality Gate)"
-      #  if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false }}
-      #  working-directory: ${{ github.event.inputs.project_dir }}
-      #  env:
-      #    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      #  run: |
-      #    mvn -B -V -s ~/.m2/settings.xml \
-      #      -Dsonar.host.url=https://sonarcloud.io \
-      #      -Dsonar.login="${SONAR_TOKEN}" \
-      #      -Dsonar.organization="${SONAR_ORG}" \
-      #      -Dsonar.projectKey="${SONAR_PROJECT_KEY}" \
-      #      -Dsonar.coverage.jacoco.xmlReportPaths="**/target/site/jacoco/jacoco.xml" \
-      #      -Dsonar.qualitygate.wait=true \
-      #      org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+      # - name: "🔎 SonarCloud (Aguarda Quality Gate)"
+      #   if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false }}
+      #   working-directory: ${{ env.PROJECT_DIR }}
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #   run: |
+      #     mvn -B -V -s ~/.m2/settings.xml \
+      #       -Dsonar.host.url=https://sonarcloud.io \
+      #       -Dsonar.login="${SONAR_TOKEN}" \
+      #       -Dsonar.organization="${SONAR_ORG}" \
+      #       -Dsonar.projectKey="${SONAR_PROJECT_KEY}" \
+      #       -Dsonar.coverage.jacoco.xmlReportPaths="**/target/site/jacoco/jacoco.xml" \
+      #       -Dsonar.qualitygate.wait=true \
+      #       org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
 
       - name: "📦 Gerar SBOM (CycloneDX)"
-        working-directory: ${{ github.event.inputs.project_dir }}
+        working-directory: ${{ env.PROJECT_DIR }}
         run: mvn -B -s ~/.m2/settings.xml cyclonedx:makeAggregateBom --no-transfer-progress
 
       - name: "📤 Publicar SBOM como artefato"
@@ -105,10 +121,10 @@ jobs:
         with:
           name: sbom-cyclonedx
           path: |
-            ${{ github.event.inputs.project_dir }}/target/bom.xml
-            ${{ github.event.inputs.project_dir }}/target/bom.json
-            ${{ github.event.inputs.project_dir }}/target/*-cyclonedx.xml
-            ${{ github.event.inputs.project_dir }}/target/*-cyclonedx.json
+            ${{ env.PROJECT_DIR }}/target/bom.xml
+            ${{ env.PROJECT_DIR }}/target/bom.json
+            ${{ env.PROJECT_DIR }}/target/*-cyclonedx.xml
+            ${{ env.PROJECT_DIR }}/target/*-cyclonedx.json
           if-no-files-found: error
           overwrite: true
 
@@ -117,20 +133,16 @@ jobs:
         uses: advanced-security/maven-dependency-submission-action@v4
 
   cd:
-    name: "🚀 CD → Imagem Docker & Deploy (Git Hub Container Registry)"
+    name: "🚀 CD → Imagem Docker & Deploy (GHCR)"
     runs-on: ubuntu-latest
     needs: ci
     if: ${{ github.event_name != 'pull_request' }}
     permissions:
       contents: write
       packages: write
-    env:
-      REGISTRY: ghcr.io
-      IMAGE_NAME: ${{ github.repository }}
-      MAVEN_USERNAME: ${{ github.actor }} # ramiralvesmelo      
-      MAVEN_PASSWORD: ${{ secrets.GH_PACKAGES_TOKEN }}  # PAT classic com read:packages (e repo se privado)
-      #DOCKERHUB_IMAGE: ramiralvesmelo/app-audit
-      
+    # Se precisar trocar usuário neste job, sobrescreva:
+    # env:
+    #   MAVEN_USERNAME: ramiralvesmelo
     steps:
       - name: "📥 Checkout"
         uses: actions/checkout@v4
@@ -150,14 +162,13 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}            
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=sha,format=short,prefix=sha-
             type=ref,event=branch
             type=ref,event=tag
-      
-      # cria o arquivo de settings.xml e injeta as credenciais
+
       - name: "🧾 Criar maven-settings.xml (arquivo)"
         id: prep-settings
         shell: bash
@@ -170,13 +181,14 @@ jobs:
                     xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
             <servers>
               <server>
-                <id>github-ramir-util</id>
+                <id>${MAVEN_SERVER_ID}</id>
                 <username>${MAVEN_USERNAME}</username>
                 <password>${MAVEN_PASSWORD}</password>
               </server>
             </servers>
           </settings>
           XML
+          sed -i 's|${MAVEN_SERVER_ID}|'"${MAVEN_SERVER_ID}"'|g' "$RUNNER_TEMP/maven-settings.xml"
           sed -i 's|${MAVEN_USERNAME}|'"${MAVEN_USERNAME}"'|g' "$RUNNER_TEMP/maven-settings.xml"
           sed -i 's|${MAVEN_PASSWORD}|'"${MAVEN_PASSWORD}"'|g' "$RUNNER_TEMP/maven-settings.xml"
           test -s "$RUNNER_TEMP/maven-settings.xml"
@@ -186,46 +198,21 @@ jobs:
         shell: bash
         run: |
           ls -l "${{ steps.prep-settings.outputs.path }}"
-          sed 's|\(<password>\).*\(</password>\)|\1***\2|' "${{ steps.prep-settings.outputs.path }}" | head -n 20 
+          sed 's|\(<password>\).*\(</password>\)|\1***\2|' "${{ steps.prep-settings.outputs.path }}" | head -n 20
 
       - name: "🐳 Build & Push (GHCR)"
         uses: docker/build-push-action@v6
         with:
-          context: ${{ github.event.inputs.project_dir }}
-          file: ${{ github.event.inputs.project_dir }}/infra/docker/Dockerfile
+          context: ${{ env.PROJECT_DIR }}
+          file: ${{ env.PROJECT_DIR }}/infra/docker/Dockerfile
           push: true
-          platforms: linux/amd64
+          platforms: ${{ env.DOCKER_PLATFORMS }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          # 1) Secret-file com settings.xml gerado no workflow
           secret-files: |
             maven_settings=${{ steps.prep-settings.outputs.path }}
-          # 2) Secrets (fallback dentro do Dockerfile)
           secrets: |
             id=gh_user,env=MAVEN_USERNAME
             id=gh_pat,env=MAVEN_PASSWORD
           cache-from: type=gha
-          cache-to: type=gha,mode=max         
-
-      # --- Trechos opcionais (comentado) ---
-      # - name: "⚙️ JDK para deploy + credencial (serverId=github)"
-      #   uses: actions/setup-java@v4
-      #   with:
-      #     distribution: temurin
-      #     java-version: "24"
-      #     cache: maven
-      #     check-latest: true
-      #     server-id: github
-      #     server-username: GITHUB_ACTOR
-      #     server-password: GITHUB_TOKEN
-      #
-      # - name: "🚀 Deploy no GitHub Packages (Maven Repository)"
-      #   working-directory: ${{ github.event.inputs.project_dir }}
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   run: |
-      #     OWNER_REPO="${{ github.repository }}"
-      #     mvn -B -V -s ~/.m2/settings.xml \
-      #       -DskipTests \
-      #       -DaltDeploymentRepository=github::default::https://maven.pkg.github.com/${OWNER_REPO} \
-      #       deploy
+          cache-to: type=gha,mode=max
