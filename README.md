@@ -1,4 +1,4 @@
-# 📘 App Demo
+# 📘 App Audit
 
 [![Build Status](https://github.com/ramiralvesmelo/app-audit/actions/workflows/maven.yml/badge.svg)](https://github.com/ramiralvesmelo/app-audit/actions/workflows/maven.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/org.springframework.boot/spring-boot-starter.svg?logo=apache-maven)](https://search.maven.org/artifact/org.springframework.boot/spring-boot-starter)
@@ -13,7 +13,7 @@
 
 ---
 
-![Integração do App Demo](infra/img/app-audit-integration.drawio.png)
+![Integração do App Audit](infra/img/app-demo-integration.drawio.png)
 
 O **app-audit** é uma aplicação de demonstração que simula um sistema **ERP (Enterprise Resource Planning)** em pequena escala, com módulos de:
 
@@ -129,7 +129,8 @@ Essa propriedade é preenchida automaticamente pelo **plugin JaCoCo** durante a 
 # Build via Power Shell
 $env:DOCKER_BUILDKIT = "1"
 $env:MAVEN_USERNAME  = "ramiralvesmelo"
-$env:MAVEN_PASSWORD  = "<SEU_PAT_READ_PACKAGES>"
+# Com permissão de leitura!
+$env:MAVEN_PASSWORD  = "<GH_PACKAGES_TOKEN>"
 
 docker buildx build `
   -f infra/docker/Dockerfile `
@@ -252,7 +253,7 @@ Para acessar o **Keycloak** pelo **nome do serviço** `keycloak` a partir do **h
 
 ## 🚀 Fluxo Simplificado (Authorization Code + PKCE)
 
-![Integração do App Demo](infra/img/auth-code-flow.png)
+![Integração do App Audit](infra/img/auth-code-flow.png)
 
 1. **Usuário clica em “Login” no App**
    O App começa o processo de autenticação.
