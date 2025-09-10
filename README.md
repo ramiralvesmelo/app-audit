@@ -173,7 +173,7 @@ docker compose -f infra/docker/docker-compose.yml up -d --build
 
 ### Subir os serviços: Kafka + KafkaUI + Zookeeper + Keycloak + PostgreSQL + Redis + Redis Commmander
 ```bash
-docker compose -f infra/docker/docker-compose.yml up -d zookeeper kafka keycloak redis postgres kafka-ui redis-commander
+docker compose -f infra/docker/docker-compose.yml up -d app-demo zookeeper kafka keycloak redis postgres kafka-ui redis-commander
 ```
 
 ### Logs do serviço app-audit

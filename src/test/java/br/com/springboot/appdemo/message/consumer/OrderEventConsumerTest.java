@@ -1,4 +1,5 @@
-package br.com.springboot.appdemo.message.consumer; 
+package br.com.springboot.appdemo.message.consumer;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
@@ -15,29 +16,29 @@ import ch.qos.logback.core.read.ListAppender;
 
 class OrderEventConsumerTest {
 
-  @Test
-  void deveRegistrarLogAoConsumirEvento() {
-    Logger logger = (Logger) LoggerFactory.getLogger(OrderEventConsumer.class);
-    ListAppender<ILoggingEvent> appender = new ListAppender<>();
-    appender.start();
-    logger.addAppender(appender);
+	@Test
+	void deveRegistrarLogAoConsumirEvento() {
+		Logger logger = (Logger) LoggerFactory.getLogger(OrderEventConsumer.class);
+		ListAppender<ILoggingEvent> appender = new ListAppender<>();
+		appender.start();
+		logger.addAppender(appender);
 
-    OrderEventConsumer consumer = new OrderEventConsumer();
-    OrderFinalizedEvent e = new OrderFinalizedEvent();
-    e.setOrderNumber("ORD-123");
-    e.setTotalAmount(new BigDecimal("99.90"));
-    e.setCustomerId(1L);
+		OrderEventConsumer consumer = new OrderEventConsumer();
+		OrderFinalizedEvent e = new OrderFinalizedEvent();
+		e.setOrderNumber("ORD-123");
+		e.setTotalAmount(new BigDecimal("99.90"));
+		e.setCustomerId(1L);
 
-    consumer.onOrderFinalized(e);
+		consumer.onOrderFinalized(e);
 
-    var logs = appender.list.stream().map(ILoggingEvent::getFormattedMessage).collect(Collectors.toList());
-    assertThat(logs).anySatisfy(msg -> {
-      assertThat(msg).contains("PEDIDO RECEBIDO PELO APP-AUDIT!");
-      assertThat(msg).contains("orderNumber=ORD-123");
-      assertThat(msg).contains("total=99.90");
-      assertThat(msg).contains("customerId=1");
-    });
+		var logs = appender.list.stream().map(ILoggingEvent::getFormattedMessage).collect(Collectors.toList());
+		assertThat(logs).anySatisfy(msg -> {
+			assertThat(msg).contains("PEDIDO RECEBIDO PELO APP-AUDIT!");
+			assertThat(msg).contains("orderNumber=ORD-123");
+			assertThat(msg).contains("total=99.90");
+			assertThat(msg).contains("customerId=1");
+		});
 
-    logger.detachAppender(appender);
-  }
+		logger.detachAppender(appender);
+	}
 }
