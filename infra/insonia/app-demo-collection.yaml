@@ -1,0 +1,669 @@
+type: collection.insomnia.rest/5.0
+name: App-Demo API Collection
+meta:
+  id: wrk_4c803ab204ef4c858c4fc1ad7ecf6f0a
+  created: 1756906505965
+  modified: 1756906505965
+  description: ""
+collection:
+  - name: App-Demo API Collection
+    meta:
+      id: fld_e37f0fe582fd4abbad233554a033005d
+      created: 1756906505967
+      modified: 1757159545845
+      sortKey: -1756906502797
+      description: ""
+    children:
+      - name: ClienteController
+        meta:
+          id: fld_edc4ca72bcd842f0a26d1807fc1cad48
+          created: 1756906505969
+          modified: 1757114073100
+          sortKey: -1756906502796
+          description: ""
+        children:
+          - url: http://localhost:8080/api/customers
+            name: Criar
+            meta:
+              id: req_88988fbfc3cb4766bc51cf87e1a3ce5f
+              created: 1756906505970
+              modified: 1757163738986
+              isPrivate: false
+              description: ""
+              sortKey: -1756906502795
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                    "name": "João da Silva",
+                    "email": "joao.silva@example.com",
+                    "phone": "83999999999",
+                    "address": "Rua das Flores, 123, Jo\u00e3o Pessoa - PB"
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+                id: pair_b5f8e52378a24d8882050af0daa3889d
+            authentication:
+              type: bearer
+              token: "{% response 'body', 'req_b5ff10b84f9841e79241225990165e7a',
+                'b64::JC5hY2Nlc3NfdG9rZW4=::46b', 'always', 60 %}"
+              disabled: false
+              prefix: ""
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: http://localhost:8080/api/customers/1
+            name: Atualizar
+            meta:
+              id: req_d95d9a8e7b974ebdb9719bcc7964c1b4
+              created: 1756906505972
+              modified: 1757162436636
+              isPrivate: false
+              description: ""
+              sortKey: -1756906502794
+            method: PUT
+            body:
+              mimeType: text/plain
+              text: |-
+                {
+                    "name": "Jo\u00e3o da Silva Junior",
+                    "email": "jose.junior@example.com",
+                    "phone": "83988888888",
+                    "address": "Av. Principal, 456, Campina Grande - PB"
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+            authentication:
+              type: bearer
+              token: "{% response 'body', 'req_b5ff10b84f9841e79241225990165e7a',
+                'b64::JC5hY2Nlc3NfdG9rZW4=::46b', 'always', 60 %}"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: http://localhost:8080/api/customers/1
+            name: Remover
+            meta:
+              id: req_856068dd7d69410c8361b26042ac3b2a
+              created: 1756906505974
+              modified: 1757162277169
+              isPrivate: false
+              description: ""
+              sortKey: -1756906502793
+            method: DELETE
+            body:
+              mimeType: text/plain
+              text: ""
+            headers:
+              - name: Content-Type
+                value: application/json
+            authentication:
+              type: bearer
+              token: "{% response 'body', 'req_b5ff10b84f9841e79241225990165e7a',
+                'b64::JC5hY2Nlc3NfdG9rZW4=::46b', 'always', 60 %}"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: http://localhost:8080/api/customers/1
+            name: Obter P/ ID
+            meta:
+              id: req_8bdfc5ff9e3e45879d565f394ca004a6
+              created: 1756906505976
+              modified: 1757162298459
+              isPrivate: false
+              description: ""
+              sortKey: -1756906502792
+            method: GET
+            authentication:
+              type: bearer
+              token: "{% response 'body', 'req_b5ff10b84f9841e79241225990165e7a',
+                'b64::JC5hY2Nlc3NfdG9rZW4=::46b', 'always', 60 %}"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: http://localhost:8080/api/customers/email/joao.silva@example.com
+            name: Obter P/ E-mail
+            meta:
+              id: req_32a3dfa17891468f80dfba9f89d43e94
+              created: 1756906505977
+              modified: 1757162294488
+              isPrivate: false
+              description: ""
+              sortKey: -1756906502791
+            method: GET
+            parameters:
+              - id: pair_9dbe741c43474b8ba5ae45fee280461e
+                name: email
+                value: joao.silva@example.com
+                description: ""
+                disabled: false
+            authentication:
+              type: bearer
+              token: "{% response 'body', 'req_b5ff10b84f9841e79241225990165e7a',
+                'b64::JC5hY2Nlc3NfdG9rZW4=::46b', 'always', 60 %}"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: http://localhost:8080/api/customers/validateEmail/joao.silva@example.com
+            name: Validar E-Mail
+            meta:
+              id: req_d3c7da0beb86401c8952d1be318d9797
+              created: 1756906505978
+              modified: 1757162348210
+              isPrivate: false
+              description: ""
+              sortKey: -1756906502790
+            method: GET
+            body:
+              mimeType: multipart/form-data
+              params:
+                - id: pair_68b257ec2b564b788a977e905036ce9e
+                  name: ""
+                  value: ""
+                  description: ""
+                  disabled: false
+            parameters:
+              - id: pair_3601b2b3815e40f8aa294214db28823b
+                name: ""
+                value: ""
+                description: ""
+                disabled: false
+            headers:
+              - name: Content-Type
+                value: multipart/form-data
+            authentication:
+              type: bearer
+              token: "{% response 'body', 'req_b5ff10b84f9841e79241225990165e7a',
+                'b64::JC5hY2Nlc3NfdG9rZW4=::46b', 'always', 60 %}"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: http://localhost:8080/api/customers
+            name: Obter Todos
+            meta:
+              id: req_7be25dc43d5e4d3b8c205e64b30474dc
+              created: 1756906505980
+              modified: 1757162351053
+              isPrivate: false
+              description: ""
+              sortKey: -1756906502789
+            method: GET
+            authentication:
+              type: bearer
+              token: "{% response 'body', 'req_b5ff10b84f9841e79241225990165e7a',
+                'b64::JC5hY2Nlc3NfdG9rZW4=::46b', 'always', 60 %}"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+      - name: ProdutosController
+        meta:
+          id: fld_4cdaaff1dfad46878a337907cfa7dae4
+          created: 1756906505981
+          modified: 1756906505981
+          sortKey: -1756906502788
+          description: ""
+        children:
+          - url: http://localhost:8080/api/products
+            name: Criar
+            meta:
+              id: req_1c94e1f5166747ebbcbf817fb7366421
+              created: 1756906505982
+              modified: 1757161953686
+              isPrivate: false
+              description: ""
+              sortKey: -1756906502787
+            method: POST
+            body:
+              mimeType: text/plain
+              text: |-
+                {    
+                    "name": "Notebook Dell Inspiron",
+                    "description": "Notebook 15'' i7, 16GB RAM, SSD 512GB",
+                    "price": 4999.90,
+                    "stock": 20,
+                    "sku": "PROD-001"
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+            authentication:
+              type: bearer
+              token: "{% response 'body', 'req_b5ff10b84f9841e79241225990165e7a',
+                'b64::JC5hY2Nlc3NfdG9rZW4=::46b', 'always', 60 %}"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: http://localhost:8080/api/products/
+            name: Obter Todos
+            meta:
+              id: req_2366efd42e0f4312961d55e515bbb271
+              created: 1756906505984
+              modified: 1757162359326
+              isPrivate: false
+              description: ""
+              sortKey: -1756906502786
+            method: GET
+            headers:
+              - name: Content-Type
+                value: application/json
+            authentication:
+              type: bearer
+              token: "{% response 'body', 'req_b5ff10b84f9841e79241225990165e7a',
+                'b64::JC5hY2Nlc3NfdG9rZW4=::46b', 'always', 60 %}"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: http://localhost:8080/api/products/1
+            name: Obter P/ ID
+            meta:
+              id: req_35c5f47ecd85418abf5f503c92323790
+              created: 1756906505985
+              modified: 1757162368008
+              isPrivate: false
+              description: ""
+              sortKey: -1756906502785
+            method: GET
+            headers:
+              - name: Content-Type
+                value: application/json
+            authentication:
+              type: bearer
+              token: "{% response 'body', 'req_b5ff10b84f9841e79241225990165e7a',
+                'b64::JC5hY2Nlc3NfdG9rZW4=::46b', 'always', 60 %}"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: http://localhost:8080/api/products/1
+            name: Atualizar
+            meta:
+              id: req_5e7fe7b5334048c395f6e3a1a867f922
+              created: 1756906505986
+              modified: 1757162384031
+              isPrivate: false
+              description: ""
+              sortKey: -1756906502784
+            method: PUT
+            body:
+              mimeType: text/plain
+              text: |-
+                {
+                    "sku": "PROD-001",
+                    "name": "Notebook Dell Inspiron",
+                    "description": "Atualizado para vers\u00e3o 2025",
+                    "price": 5299.9,
+                    "stock": 15
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+            authentication:
+              type: bearer
+              token: "{% response 'body', 'req_b5ff10b84f9841e79241225990165e7a',
+                'b64::JC5hY2Nlc3NfdG9rZW4=::46b', 'always', 60 %}"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: http://localhost:8080/api/products/1/stock
+            name: Atualizar Estoque
+            meta:
+              id: req_19062cc57cc745a2a9a8032078cad128
+              created: 1756906505987
+              modified: 1757162394060
+              isPrivate: false
+              description: ""
+              sortKey: -1756906502783
+            method: PUT
+            body:
+              mimeType: text/plain
+              text: |-
+                {
+                    "sku": "PROD-001",
+                    "name": "Notebook Dell Inspiron",
+                    "description": "Atualizado para vers\u00e3o 2025",
+                    "price": 5299.9,
+                    "stock": 15
+                }
+            parameters:
+              - name: stock
+                value: "30"
+                disabled: false
+            headers:
+              - name: Content-Type
+                value: application/json
+            authentication:
+              type: bearer
+              token: "{% response 'body', 'req_b5ff10b84f9841e79241225990165e7a',
+                'b64::JC5hY2Nlc3NfdG9rZW4=::46b', 'always', 60 %}"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: http://localhost:8080/api/products/sku/PROD-001
+            name: Obter P/ SKU
+            meta:
+              id: req_66ce3bed0167455f9e17e0ea3d650594
+              created: 1756906505989
+              modified: 1757162406316
+              isPrivate: false
+              description: ""
+              sortKey: -1756906502782
+            method: GET
+            headers:
+              - name: Content-Type
+                value: application/json
+            authentication:
+              type: bearer
+              token: "{% response 'body', 'req_b5ff10b84f9841e79241225990165e7a',
+                'b64::JC5hY2Nlc3NfdG9rZW4=::46b', 'always', 60 %}"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+      - name: PedidoController
+        meta:
+          id: fld_4ad0054dc5264f48ab9b31d39d073f0a
+          created: 1756906505991
+          modified: 1756906505991
+          sortKey: -1756906502781
+          description: ""
+        children:
+          - url: http://localhost:8080/api/orders
+            name: Criar Pedido
+            meta:
+              id: req_48df054679fe41118162cd0f567a7310
+              created: 1756906505993
+              modified: 1757162256395
+              isPrivate: false
+              description: ""
+              sortKey: -1756906502780
+            method: POST
+            body:
+              mimeType: text/plain
+              text: |-
+                [
+                    {
+                        "productId": 1,
+                        "quantity": 1,
+                        "price": 250.0
+                    }
+                ]
+            parameters:
+              - name: customerId
+                value: "1"
+                disabled: false
+            headers:
+              - name: Content-Type
+                value: application/json
+            authentication:
+              type: bearer
+              token: "{% response 'body', 'req_b5ff10b84f9841e79241225990165e7a',
+                'b64::JC5hY2Nlc3NfdG9rZW4=::46b', 'always', 60 %}"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: http://localhost:8080/api/orders/1/items
+            name: Adicionar Item ao Pedido
+            meta:
+              id: req_a1ce9c8910bc4f06a0016e9e4268e4bf
+              created: 1756906505994
+              modified: 1757162414522
+              isPrivate: false
+              description: ""
+              sortKey: -1756906502779
+            method: POST
+            body:
+              mimeType: text/plain
+              text: |-
+                {
+                    "productId": 103,
+                    "quantity": 1,
+                    "price": 800.0
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+            authentication:
+              type: bearer
+              token: "{% response 'body', 'req_b5ff10b84f9841e79241225990165e7a',
+                'b64::JC5hY2Nlc3NfdG9rZW4=::46b', 'always', 60 %}"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: http://localhost:8080/api/orders/1/finalize
+            name: Finalizar Pedido
+            meta:
+              id: req_a715d41218aa4b7e8a08149016c960bd
+              created: 1756906505995
+              modified: 1757162420063
+              isPrivate: false
+              description: ""
+              sortKey: -1756906502778
+            method: POST
+            body:
+              mimeType: text/plain
+              text: ""
+            headers:
+              - name: Content-Type
+                value: application/json
+            authentication:
+              type: bearer
+              token: "{% response 'body', 'req_b5ff10b84f9841e79241225990165e7a',
+                'b64::JC5hY2Nlc3NfdG9rZW4=::46b', 'always', 60 %}"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: http://localhost:8080/api/orders/1/items
+            name: Atualizar Item do Pedido
+            meta:
+              id: req_4060c0e302e84244895bdb8dd4364b7d
+              created: 1756906505996
+              modified: 1757162428521
+              isPrivate: false
+              description: ""
+              sortKey: -1756906502777
+            method: PUT
+            body:
+              mimeType: text/plain
+              text: |-
+                {
+                    "id": 5,
+                    "productId": 101,
+                    "quantity": 3,
+                    "price": 250.0
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+            authentication:
+              type: bearer
+              token: "{% response 'body', 'req_b5ff10b84f9841e79241225990165e7a',
+                'b64::JC5hY2Nlc3NfdG9rZW4=::46b', 'always', 60 %}"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+      - name: Keycloak
+        meta:
+          id: fld_48b7874d20ea45d39b30d0c16e8e4ec2
+          created: 1757100138939
+          modified: 1757100176780
+          sortKey: -1757100138939
+          description: ""
+        children:
+          - url: http://localhost:8081/realms/app-demo/protocol/openid-connect/token
+            name: Gerar Token JWT
+            meta:
+              id: req_b5ff10b84f9841e79241225990165e7a
+              created: 1757100179371
+              modified: 1757164068983
+              isPrivate: false
+              description: ""
+              sortKey: -1757100179371
+            method: POST
+            body:
+              mimeType: application/x-www-form-urlencoded
+              params:
+                - id: pair_d5bddd9d5a2b4a7184d33a77fb37aa7e
+                  name: client_id
+                  value: app-demo-api
+                  description: ""
+                  disabled: false
+                - id: pair_5edb52d1e103497b94aedc531c8fbef2
+                  name: username
+                  value: appdemo
+                  description: ""
+                  disabled: false
+                - id: pair_8d3aac0616484dbf94345244f012fc51
+                  name: password
+                  value: "123"
+                  description: ""
+                  disabled: false
+                - id: pair_f02b9056b93947018fefed1b6256a65d
+                  name: grant_type
+                  value: password
+                  description: ""
+                  disabled: false
+            parameters:
+              - id: pair_776d7eb62f544a6d9e4430856aaeddb0
+                name: ""
+                value: ""
+                description: ""
+                disabled: false
+            headers:
+              - name: Content-Type
+                value: application/x-www-form-urlencoded
+              - name: User-Agent
+                value: insomnia/11.5.0
+                id: pair_38512c612ae0416abb67c26dcec8a258
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: false
+              rebuildPath: true
+    environment:
+      BASE_URL: http://localhost:8080
+      TOKEN: eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI1clA2MXlLRTNUclVOdGlmUXdTMFRSeVR6STBYSTR4V2g3MUZ1U2NLaWdzIn0.eyJleHAiOjE3NTcxNTk4MjYsImlhdCI6MTc1NzE1OTUyNiwianRpIjoiMzc4OTQzNWQtMDdjNy00ZjM5LThmODAtNTc0NmI4OTAwNTZlIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgxL3JlYWxtcy9hcHAtZGVtbyIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiJhOTg2NDc5NS02NTdmLTRhZjQtYWY5OC05ZWUxY2FkNjM1YmUiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJhcHAtZGVtby1hcGkiLCJzaWQiOiJmMzkyMzhmNy03NmE3LTRhNmEtOTMzMy05NTc0ZDcwZmQ4YzUiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbIioiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImRlZmF1bHQtcm9sZXMtYXBwLWRlbW8iLCJvZmZsaW5lX2FjY2VzcyIsInVtYV9hdXRob3JpemF0aW9uIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJlbWFpbCBwcm9maWxlIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsIm5hbWUiOiJhcHBkZW1vIGFwcGRlbW8iLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJhcHBkZW1vIiwiZ2l2ZW5fbmFtZSI6ImFwcGRlbW8iLCJmYW1pbHlfbmFtZSI6ImFwcGRlbW8iLCJlbWFpbCI6ImFwcGRlbW9AZ21haWwuY29tIn0.dlBUpMFwjZVePU5fIGOMu5gdIxW5W3Nz-L_8igi_tl4A9RsSLSQ_2UKyunmG39GluuIaOgktCjK3k9H9dYF4S5KztSc9ugSSd4cs-3TcQhgiNspB8bNrF2LBhvg9DiCvtGbW83rupsdqj120TFOcCyP3YqmR-y0Vr7SoXoEQoiVcyMO4NbiJ4vwME4fiWRx1RNn4P6Dqj2WJP9ZZmZoVhRCOZdJjBUxRFxmWxRyIkCak7K_paA3w2Kdu5ntwcmwTKjOwrz-RIKg0uzkx7TF6PEp7PQzqocTawFsFbTwVshYAjO70RrtFt2vx80e3ODWIRitN2TFIq-IBloa10vhZNQ
+    environmentPropertyOrder:
+      "&":
+        - BASE_URL
+        - TOKEN
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_c344232b305d06fbef0dd37660908694fc2c36ee
+    created: 1756906506007
+    modified: 1757162525960
+  cookies:
+    - key: JSESSIONID
+      value: F712A933A3E5F7FBF2B2D4FE9640E3BC
+      domain: localhost
+      path: /
+      httpOnly: true
+      hostOnly: true
+      creation: 2025-09-05T18:19:20.942Z
+      lastAccessed: 2025-09-05T18:19:20.942Z
+      id: 4e6363e4-d64e-4593-8c75-fcb3949e0bd5
+    - key: SESSION
+      value: YmMyNmJiOTMtZDk3OC00MzA0LTkzN2EtMDZiYmU2ZmE5NmM4
+      domain: localhost
+      path: /
+      httpOnly: true
+      hostOnly: true
+      creation: 2025-09-05T22:58:29.815Z
+      lastAccessed: 2025-09-06T12:42:05.960Z
+      sameSite: lax
+      id: 01b32386-3baf-46c9-adf2-208c330688f0
+environments:
+  name: Base Environment
+  meta:
+    id: env_c344232b305d06fbef0dd37660908694fc2c36ee
+    created: 1756906505998
+    modified: 1756906505998
+    isPrivate: false

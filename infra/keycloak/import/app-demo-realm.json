@@ -1,0 +1,44 @@
+{
+  "realm": "app-demo",
+  "enabled": true,
+  "clients": [
+    {
+      "clientId": "app-demo-api",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "directAccessGrantsEnabled": true,
+      "standardFlowEnabled": true,
+      "serviceAccountsEnabled": false,
+      "authorizationServicesEnabled": false,
+      "redirectUris": ["*"],
+      "webOrigins": ["*"]
+    }
+  ],
+  "roles": {
+    "realm": [
+      {
+        "name": "ADMIN",
+        "description": "Admin role for app-demo API"
+      }
+    ]
+  },
+  "users": [
+    {
+      "username": "appdemo",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "App",
+      "lastName": "Demo",
+      "email": "appdemo@example.com",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["ADMIN"]
+    }
+  ]
+}
