@@ -30,9 +30,9 @@ jobs:
       packages: write
     env:
       MAVEN_USERNAME: ramiralvesmelo
-      MAVEN_PASSWORD: ${{ secrets.GH_PACKAGES_TOKEN }}      
+      MAVEN_PASSWORD: ${{ secrets.GH_PACKAGES_TOKEN }}
       SONAR_ORG: ramiralvesmelo
-      SONAR_PROJECT_KEY: ramiralvesmelo_app-audit      
+      SONAR_PROJECT_KEY: ramiralvesmelo_app-audit
 
     steps:
       - name: "📥 Checkout do repositório"
@@ -41,7 +41,7 @@ jobs:
       - name: 🧹 Remover jacocoArgLine vazio do pom.xml
         run: |
           sed -i 's|<jacocoArgLine></jacocoArgLine>||g' pom.xml
-          echo "✅ jacocoArgLine removido do pom.xml"              
+          echo "✅ jacocoArgLine removido do pom.xml"
 
       - name: "⚙️ JDK 24 + cache Maven + credencial (read via PAT)"
         uses: actions/setup-java@v4
@@ -50,10 +50,9 @@ jobs:
           java-version: "24"
           cache: maven
           check-latest: true
-          # Gera ~/.m2/settings.xml automaticamente com <servers>
-          server-id: github-ramir-util             
-          server-username: MAVEN_USERNAME          
-          server-password: MAVEN_PASSWORD          
+          server-id: github-ramir-util
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
 
       - name: "🔎 Verificar Versão Java | Maven"
         run: |
@@ -85,24 +84,12 @@ jobs:
           fail_ci_if_error: true
           verbose: false
 
-      #- name: "🔎 SonarCloud (Aguarda Quality Gate)"
-      #  if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false }}
-      #  working-directory: ${{ github.event.inputs.project_dir }}
-      #  env:
-      #    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      #  run: |
-      #    mvn -B -V -s ~/.m2/settings.xml \
-      #      -Dsonar.host.url=https://sonarcloud.io \
-      #      -Dsonar.login="${SONAR_TOKEN}" \
-      #      -Dsonar.organization="${SONAR_ORG}" \
-      #      -Dsonar.projectKey="${SONAR_PROJECT_KEY}" \
-      #      -Dsonar.coverage.jacoco.xmlReportPaths="**/target/site/jacoco/jacoco.xml" \
-      #      -Dsonar.qualitygate.wait=true \
-      #      org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+      # - name: "🔎 SonarCloud (Aguarda Quality Gate)"
+      #   ...
 
       - name: "📦 Gerar SBOM (CycloneDX)"
         working-directory: ${{ github.event.inputs.project_dir }}
-        run: mvn -B -s ~/.m2/settings.xml cyclonedx:makeAggregateBom --no-transfer-progress
+        run: mvn -B -s ~/.m2/settings.xml -ntp cyclonedx:makeAggregateBom
 
       - name: "📤 Publicar SBOM como artefato"
         uses: actions/upload-artifact@v4
@@ -131,10 +118,9 @@ jobs:
     env:
       REGISTRY: ghcr.io
       IMAGE_NAME: ${{ github.repository }}
-      MAVEN_USERNAME: ramiralvesmelo      
-      MAVEN_PASSWORD: ${{ secrets.GH_PACKAGES_TOKEN }}  # PAT classic com read:packages (e repo se privado)
-      #DOCKERHUB_IMAGE: ramiralvesmelo/app-audit
-      
+      MAVEN_USERNAME: ramiralvesmelo
+      MAVEN_PASSWORD: ${{ secrets.GH_PACKAGES_TOKEN }}
+
     steps:
       - name: "📥 Checkout"
         uses: actions/checkout@v4
@@ -154,43 +140,12 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}            
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=sha,format=short,prefix=sha-
             type=ref,event=branch
             type=ref,event=tag
-
-      # cria o arquivo de settings.xml e injeta as credenciais
-      - name: "🧾 Criar maven-settings.xml (arquivo)"
-        id: prep-settings
-        shell: bash
-        run: |
-          set -euo pipefail
-          cat > "$RUNNER_TEMP/maven-settings.xml" <<'XML'
-          <?xml version="1.0" encoding="UTF-8"?>
-          <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
-                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                    xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
-            <servers>
-              <server>
-                <id>github-ramir-util</id>
-                <username>${MAVEN_USERNAME}</username>
-                <password>${MAVEN_PASSWORD}</password>
-              </server>
-            </servers>
-          </settings>
-          XML
-          sed -i 's|${MAVEN_USERNAME}|'"${MAVEN_USERNAME}"'|g' "$RUNNER_TEMP/maven-settings.xml"
-          sed -i 's|${MAVEN_PASSWORD}|'"${MAVEN_PASSWORD}"'|g' "$RUNNER_TEMP/maven-settings.xml"
-          test -s "$RUNNER_TEMP/maven-settings.xml"
-          echo "path=$RUNNER_TEMP/maven-settings.xml" >> "$GITHUB_OUTPUT"
-
-      - name: "👀 Conferir settings (mascarado)"
-        shell: bash
-        run: |
-          ls -l "${{ steps.prep-settings.outputs.path }}"
-          sed 's|\(<password>\).*\(</password>\)|\1***\2|' "${{ steps.prep-settings.outputs.path }}" | head -n 20
 
       - name: "🐳 Build & Push (GHCR)"
         uses: docker/build-push-action@v6
@@ -201,7 +156,7 @@ jobs:
           platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          # Alinhado com o Dockerfile (gh_user / gh_pat)
+          # Secrets alinhados com o Dockerfile (gh_user/gh_pat)
           secrets: |
             id=gh_user,env=MAVEN_USERNAME
             id=gh_pat,env=MAVEN_PASSWORD
