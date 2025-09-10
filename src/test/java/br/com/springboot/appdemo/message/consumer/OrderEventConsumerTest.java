@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 
 import br.com.ramiralvesmelo.audit.message.consumer.OrderEventConsumer;
-import br.com.ramiralvesmelo.audit.message.event.OrderFinalizedEvent;
+import br.com.ramiralvesmelo.util.message.event.OrderFinalizedEvent;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;

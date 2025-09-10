@@ -3,7 +3,7 @@ package br.com.ramiralvesmelo.audit.message.consumer;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
-import br.com.ramiralvesmelo.audit.message.event.OrderFinalizedEvent;
+import br.com.ramiralvesmelo.util.message.event.OrderFinalizedEvent;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
