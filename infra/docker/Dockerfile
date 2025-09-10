@@ -9,15 +9,19 @@ WORKDIR /app
 # Copia só o POM p/ maximizar cache de deps
 COPY pom.xml .
 
-# Baixa dependências (usa secrets para GitHub Packages)
+# Baixa dependências (usa maven_settings se existir; senão gera via gh_user/gh_pat)
 RUN --mount=type=cache,target=/root/.m2 \
-    --mount=type=secret,id=gh_user \
-    --mount=type=secret,id=gh_pat \
+    --mount=type=secret,id=maven_settings,target=/tmp/maven_settings.xml,required=false \
+    --mount=type=secret,id=gh_user,required=false \
+    --mount=type=secret,id=gh_pat,required=false \
     set -eu; \
-    U="$(cat /run/secrets/gh_user)"; \
-    P="$(cat /run/secrets/gh_pat)"; \
     install -d -m 700 /root/.m2; \
-    printf '%s\n' \
+    if [ -f /tmp/maven_settings.xml ]; then \
+      cp /tmp/maven_settings.xml /root/.m2/settings.xml; \
+    else \
+      U="$(cat /run/secrets/gh_user)"; \
+      P="$(cat /run/secrets/gh_pat)"; \
+      printf '%s\n' \
 '<?xml version="1.0" encoding="UTF-8"?>' \
 '<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">' \
 '  <servers>' \
@@ -38,21 +42,26 @@ RUN --mount=type=cache,target=/root/.m2 \
 '  </profiles>' \
 '  <activeProfiles><activeProfile>repos</activeProfile></activeProfiles>' \
 '</settings>' > /root/.m2/settings.xml; \
+    fi; \
     mvn -s /root/.m2/settings.xml -B -V -U -ntp dependency:go-offline; \
     rm -f /root/.m2/settings.xml
 
 # Copia o código fonte
 COPY src ./src
 
-# Empacota o app (gera o JAR)
+# Empacota o app (gera o JAR) — mesmo esquema: usa maven_settings se existir; senão gera
 RUN --mount=type=cache,target=/root/.m2 \
-    --mount=type=secret,id=gh_user \
-    --mount=type=secret,id=gh_pat \
+    --mount=type=secret,id=maven_settings,target=/tmp/maven_settings.xml,required=false \
+    --mount=type=secret,id=gh_user,required=false \
+    --mount=type=secret,id=gh_pat,required=false \
     set -eu; \
-    U="$(cat /run/secrets/gh_user)"; \
-    P="$(cat /run/secrets/gh_pat)"; \
     install -d -m 700 /root/.m2; \
-    printf '%s\n' \
+    if [ -f /tmp/maven_settings.xml ]; then \
+      cp /tmp/maven_settings.xml /root/.m2/settings.xml; \
+    else \
+      U="$(cat /run/secrets/gh_user)"; \
+      P="$(cat /run/secrets/gh_pat)"; \
+      printf '%s\n' \
 '<?xml version="1.0" encoding="UTF-8"?>' \
 '<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0">' \
 '  <servers>' \
@@ -63,6 +72,7 @@ RUN --mount=type=cache,target=/root/.m2 \
 '    </server>' \
 '  </servers>' \
 '</settings>' > /root/.m2/settings.xml; \
+    fi; \
     mvn -s /root/.m2/settings.xml -B -V -ntp -DskipTests package; \
     rm -f /root/.m2/settings.xml
 
@@ -72,10 +82,9 @@ RUN --mount=type=cache,target=/root/.m2 \
 FROM eclipse-temurin:24-jre
 WORKDIR /app
 
-# Usuário não-root
 RUN addgroup --system app && adduser --system --ingroup app app
 
-# Copia o JAR (ajuste o nome se necessário)
+# Se houver mais de um JAR no target, fixe <finalName> no POM
 COPY --from=build /app/target/*.jar /app/app.jar
 
 EXPOSE 8080

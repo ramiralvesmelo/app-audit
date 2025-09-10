@@ -160,6 +160,10 @@ jobs:
             type=sha,format=short,prefix=sha-
             type=ref,event=branch
             type=ref,event=tag
+      
+      - name: "📦 Gerar SBOM (CycloneDX)"
+        working-directory: ${{ github.event.inputs.project_dir }}
+        run: mvn -B -s ~/.m2/settings.xml -ntp cyclonedx:makeAggregateBom
 
       # cria o arquivo de settings.xml e injeta as credenciais
       - name: "🧾 Criar maven-settings.xml (arquivo)"
@@ -190,7 +194,7 @@ jobs:
         shell: bash
         run: |
           ls -l "${{ steps.prep-settings.outputs.path }}"
-          sed 's|\(<password>\).*\(</password>\)|\1***\2|' "${{ steps.prep-settings.outputs.path }}" | head -n 20
+          sed 's|\(<password>\).*\(</password>\)|\1***\2|' "${{ steps.prep-settings.outputs.path }}" | head -n 20 
 
       - name: "🐳 Build & Push (GHCR)"
         uses: docker/build-push-action@v6
@@ -201,12 +205,15 @@ jobs:
           platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          # 👇 alinhar com o Dockerfile (gh_user / gh_pat)
+          # 1) Secret-file com settings.xml gerado no workflow
+          secret-files: |
+            maven_settings=${{ steps.prep-settings.outputs.path }}
+          # 2) Secrets (fallback dentro do Dockerfile)
           secrets: |
             id=gh_user,env=MAVEN_USERNAME
             id=gh_pat,env=MAVEN_PASSWORD
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-to: type=gha,mode=max         
 
       # --- Trechos opcionais (comentado) ---
       # - name: "⚙️ JDK para deploy + credencial (serverId=github)"
