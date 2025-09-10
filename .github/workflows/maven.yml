@@ -161,10 +161,6 @@ jobs:
             type=ref,event=branch
             type=ref,event=tag
       
-      - name: "📦 Gerar SBOM (CycloneDX)"
-        working-directory: ${{ github.event.inputs.project_dir }}
-        run: mvn -B -s ~/.m2/settings.xml -ntp cyclonedx:makeAggregateBom
-
       # cria o arquivo de settings.xml e injeta as credenciais
       - name: "🧾 Criar maven-settings.xml (arquivo)"
         id: prep-settings

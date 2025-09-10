@@ -127,17 +127,15 @@ Essa propriedade é preenchida automaticamente pelo **plugin JaCoCo** durante a 
 
 ```bash
 # Build via Power Shell
-$env:MAVEN_USERNAME   = "ramiralvesmelo"
-# Token de acesso com grant pra leitura
-$env:MAVEN_PASSWORD   = "GH_PACKAGES_TOKEN"
-$settings             = "infra/docker/maven-settings.xml"
+$env:DOCKER_BUILDKIT = "1"
+$env:MAVEN_USERNAME  = "ramiralvesmelo"
+$env:MAVEN_PASSWORD  = "<SEU_PAT_READ_PACKAGES>"
 
-docker build `
+docker buildx build `
   -f infra/docker/Dockerfile `
   --secret id=gh_user,env=MAVEN_USERNAME `
   --secret id=gh_pat,env=MAVEN_PASSWORD `
   -t app-audit:1.0.0 .
-
 
 # Executar container
 docker run --rm -p 8080:8080 app-audit:1.0.0
