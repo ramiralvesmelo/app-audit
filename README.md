@@ -127,7 +127,7 @@ Essa propriedade é preenchida automaticamente pelo **plugin JaCoCo** durante a 
 
 ```bash
 # Build via Power Shell
-$env:DOCKER_BUILDKIT = "1"
+# $env:DOCKER_BUILDKIT = "1"
 $env:MAVEN_USERNAME  = "ramiralvesmelo"
 # Substitua pelo seu PAT (token classic com read:packages)
 $env:MAVEN_PASSWORD  = "<GH_PACKAGES_TOKEN>"

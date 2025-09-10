@@ -1,15 +1,18 @@
+version: "3.9"
+
 services:
-  app-demo:    
-    #image: .
-    #image: app-demo:4.0.0
-    image: ramiralvesmelo/app-demo
-    #image: ghcr.io/ramiralvesmelo/app-demo:latest
+  app-demo:
+    image: ramiralvesmelo/app-demo:latest
+    build:
+      context: ../..                 # <-- dois níveis acima (pom.xml)
+      dockerfile: infra/docker/Dockerfile
+      secrets:
+        - gh_user
+        - gh_pat
     container_name: app-demo
-    build: .
     ports:
       - "8080:8080"
     environment:
-      # Perfis Padrão
       SPRING_PROFILES_ACTIVE: docker
       SERVER_ADDRESS: "0.0.0.0"
       SERVER_PORT: "8080"
@@ -28,7 +31,7 @@ services:
       # Kafka
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
 
-      # Redis (Spring Boot)
+      # Redis
       SPRING_REDIS_HOST: redis
       SPRING_REDIS_PORT: "6379"
     depends_on:
@@ -44,41 +47,41 @@ services:
       timeout: 5s
       retries: 5
 
-  app-audit:    
-    image: ramiralvesmelo/app-audit
-    # se quiser buildar local:
-    # build: ./app-audit
+  app-audit:
+    image: app-audit:1.0.0
+    build:
+      context: ../..                 # <-- dois níveis acima (pom.xml)
+      dockerfile: infra/docker/Dockerfile
+      secrets:
+        - gh_user
+        - gh_pat
     container_name: app-audit
     ports:
-      - "8084:8080"   # exposto no host em 8084, mas roda interno na porta 8080
+      - "8084:8080"   # host:container
     environment:
-      # Perfis Padrão
       SPRING_PROFILES_ACTIVE: docker
       SERVER_ADDRESS: "0.0.0.0"
       SERVER_PORT: "8080"
 
-      # Keycloak (mesmo realm do app-demo)
-      #SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: "http://keycloak:8081/realms/app-demo"
+      # Keycloak (habilite se o app exigir JWT)
+      # SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: "http://keycloak:8081/realms/app-demo"
 
-      # Kafka (para consumir eventos de auditoria)
+      # Kafka (consumo de eventos de auditoria)
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
 
-      # Redis (opcional, se usar cache)
+      # Redis (opcional)
       SPRING_REDIS_HOST: redis
       SPRING_REDIS_PORT: "6379"
-
     depends_on:
       kafka:
         condition: service_started
       redis:
         condition: service_healthy
-
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://localhost:8080/actuator/health | grep UP || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 5
-
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.6.0
@@ -103,14 +106,10 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-
-      # Listeners interno/externo
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-
-      # Single-broker settings (dev/test)
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
@@ -129,19 +128,11 @@ services:
     image: provectuslabs/kafka-ui:latest
     container_name: kafka-ui
     ports:
-      - "8083:8080"              # UI acessível em http://localhost:8083
+      - "8083:8080"  # http://localhost:8083
     environment:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
       KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
-      # Flags para evitar cookie_not_found em DEV (HTTP + hostname livre)
-      KC_HTTP_ENABLED: "true"
-      KC_HOSTNAME_STRICT: "false"
-      KC_HOSTNAME_STRICT_HTTPS: "false"
-      KC_PROXY_HEADERS: "xforwarded"
-      # (Opcional) hostname explícito p/ consistência
-      KC_HOSTNAME: "localhost"
-
     depends_on:
       kafka:
         condition: service_started
@@ -170,12 +161,12 @@ services:
       - "8081:8081"
     volumes:
       - ../keycloak/import:/opt/keycloak/data/import
-      - ../keycloak/data:/opt/keycloak/data      
+      - ../keycloak/data:/opt/keycloak/data
     healthcheck:
       test: ["CMD-SHELL","curl -fsS http://localhost:8081/realms/master/.well-known/openid-configuration >/dev/null || exit 1"]
       interval: 10s
       timeout: 5s
-      retries: 10      
+      retries: 10
 
   postgres:
     image: postgres:15-alpine
@@ -192,7 +183,7 @@ services:
       test: ["CMD-SHELL","pg_isready -U appuser -d appdb -h localhost"]
       interval: 5s
       timeout: 3s
-      retries: 12      
+      retries: 12
 
   redis:
     image: redis:7-alpine
@@ -204,7 +195,7 @@ services:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 3s
-      retries: 5  
+      retries: 5
 
   redis-commander:
     image: rediscommander/redis-commander:latest
@@ -220,3 +211,10 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+# === Build secrets (Maven credenciais via env) ===
+secrets:
+  gh_user:
+    environment: MAVEN_USERNAME
+  gh_pat:
+    environment: MAVEN_PASSWORD
