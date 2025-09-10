@@ -16,7 +16,6 @@ permissions:
   contents: read
   packages: write
 
-# 🔝 Escopo MAIOR (workflow-level)
 env:
   # Reutilizáveis
   JAVA_VERSION: "24"
@@ -38,6 +37,12 @@ env:
   PROJECT_DIR: ${{ github.event.inputs.project_dir }}
   MODULE_GAV: ${{ github.event.inputs.module_gav }}
 
+  # Docker Hub (VARIÁVELS DE AMBIENTE DEFINIDA COMO SECRET)
+  DOCKERHUB_REGISTRY: docker.io
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+  DOCKERHUB_IMAGE: ramiralvesmelo/app-audit
+
 jobs:
 
   ci:
@@ -46,7 +51,6 @@ jobs:
     permissions:
       contents: write
       packages: write
-    # Caso precise sobrescrever algo aqui, use 'env:' no job
     steps:
       - name: "📥 Checkout do repositório"
         uses: actions/checkout@v4
@@ -56,7 +60,7 @@ jobs:
           sed -i 's|<jacocoArgLine></jacocoArgLine>||g' pom.xml
           echo "✅ jacocoArgLine removido do pom.xml"
 
-      - name: "⚙️ JDK ${ { env.JAVA_VERSION } } + cache Maven + credencial"
+      - name: "⚙️ JDK ${{ env.JAVA_VERSION }} + cache Maven + credencial"
         uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -97,20 +101,20 @@ jobs:
           fail_ci_if_error: true
           verbose: false
 
-      # - name: "🔎 SonarCloud (Aguarda Quality Gate)"
-      #   if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false }}
-      #   working-directory: ${{ env.PROJECT_DIR }}
-      #   env:
-      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      #   run: |
-      #     mvn -B -V -s ~/.m2/settings.xml \
-      #       -Dsonar.host.url=https://sonarcloud.io \
-      #       -Dsonar.login="${SONAR_TOKEN}" \
-      #       -Dsonar.organization="${SONAR_ORG}" \
-      #       -Dsonar.projectKey="${SONAR_PROJECT_KEY}" \
-      #       -Dsonar.coverage.jacoco.xmlReportPaths="**/target/site/jacoco/jacoco.xml" \
-      #       -Dsonar.qualitygate.wait=true \
-      #       org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+      - name: "🔎 SonarCloud (Aguarda Quality Gate)"
+        if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false }}
+        working-directory: ${{ env.PROJECT_DIR }}
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          mvn -B -V -s ~/.m2/settings.xml \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.login="${SONAR_TOKEN}" \
+            -Dsonar.organization="${SONAR_ORG}" \
+            -Dsonar.projectKey="${SONAR_PROJECT_KEY}" \
+            -Dsonar.coverage.jacoco.xmlReportPaths="**/target/site/jacoco/jacoco.xml" \
+            -Dsonar.qualitygate.wait=true \
+            org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
 
       - name: "📦 Gerar SBOM (CycloneDX)"
         working-directory: ${{ env.PROJECT_DIR }}
@@ -140,9 +144,6 @@ jobs:
     permissions:
       contents: write
       packages: write
-    # Se precisar trocar usuário neste job, sobrescreva:
-    # env:
-    #   MAVEN_USERNAME: ramiralvesmelo
     steps:
       - name: "📥 Checkout"
         uses: actions/checkout@v4
@@ -157,12 +158,21 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: "🔑 Login no Docker Hub"
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.DOCKERHUB_REGISTRY }}
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          password: ${{ env.DOCKERHUB_PASSWORD }}
+
       - name: "🏷️ Metadados da imagem (tags/labels)"
         id: meta
         uses: docker/metadata-action@v5
         with:
+          # GHCR + Docker Hub
           images: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+            ${{DOCKERHUB_IMAGE}}
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=sha,format=short,prefix=sha-
