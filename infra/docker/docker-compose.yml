@@ -1,12 +1,11 @@
-version: "3.9"
-
 services:
   app-api:
-    #image: app-api:1.0.0
-    #image: ghcr.io/ramiralvesmelo/app-api
-    image: ramiralvesmelo/app-api
+    # ➡️ Escolha UMA das linhas abaixo (descomente a desejada)
+    # image: app-api:1.0.0                # build local (tag local)
+    # image: ghcr.io/ramiralvesmelo/app-api  # GHCR
+    image: ramiralvesmelo/app-api           # Docker Hub
     build:
-      context: ../..                 # <-- dois níveis acima (pom.xml)
+      context: ../..
       dockerfile: infra/docker/Dockerfile
       secrets:
         - gh_user
@@ -18,22 +17,14 @@ services:
       SPRING_PROFILES_ACTIVE: docker
       SERVER_ADDRESS: "0.0.0.0"
       SERVER_PORT: "8080"
-
-      # Keycloak
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: "http://keycloak:8081/realms/app-api"
-
-      # Banco de dados (PostgreSQL)
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: "http://keycloak:8081/realms/app-api-realm"
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/appdb
       SPRING_DATASOURCE_USERNAME: appuser
       SPRING_DATASOURCE_PASSWORD: apppass
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
       SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
-
-      # Kafka
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-
-      # Redis
       SPRING_REDIS_HOST: redis
       SPRING_REDIS_PORT: "6379"
     depends_on:
@@ -48,32 +39,26 @@ services:
       interval: 15s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   app-audit:
-    #image: app-audit:1.0.0
-    #image: ghcr.io/ramiralvesmelo/app-audit
+    # image: app-audit:1.0.0
+    # image: ghcr.io/ramiralvesmelo/app-audit
     image: ramiralvesmelo/app-audit
     build:
-      context: ../..                 # <-- dois níveis acima (pom.xml)
+      context: ../..
       dockerfile: infra/docker/Dockerfile
       secrets:
         - gh_user
         - gh_pat
     container_name: app-audit
     ports:
-      - "8084:8080"   # host:container
+      - "8084:8080"
     environment:
       SPRING_PROFILES_ACTIVE: docker
       SERVER_ADDRESS: "0.0.0.0"
       SERVER_PORT: "8080"
-
-      # Keycloak (habilite se o app exigir JWT)
-      # SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: "http://keycloak:8081/realms/app-api"
-
-      # Kafka (consumo de eventos de auditoria)
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-
-      # Redis (opcional)
       SPRING_REDIS_HOST: redis
       SPRING_REDIS_PORT: "6379"
     depends_on:
@@ -86,6 +71,7 @@ services:
       interval: 15s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.6.0
@@ -96,10 +82,12 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     healthcheck:
-      test: ["CMD", "echo", "ruok", "|", "nc", "localhost", "2181", "|", "grep", "imok"]
+      # ✅ usar CMD-SHELL para permitir pipes
+      test: ["CMD-SHELL", "echo ruok | nc -w 2 localhost 2181 | grep imok || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 10
+    restart: unless-stopped
 
   kafka:
     image: confluentinc/cp-kafka:7.6.0
@@ -127,12 +115,13 @@ services:
       interval: 15s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     container_name: kafka-ui
     ports:
-      - "8083:8080"  # http://localhost:8083
+      - "8083:8080"
     environment:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
@@ -147,6 +136,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+    restart: unless-stopped
 
   keycloak:
     image: quay.io/keycloak/keycloak:25.0
@@ -167,10 +157,11 @@ services:
       - ./keycloak/import:/opt/keycloak/data/import
       - ./keycloak/data:/opt/keycloak/data
     healthcheck:
-      test: ["CMD-SHELL","curl -fsS http://localhost:8081/realms/master/.well-known/openid-configuration >/dev/null || exit 1"]
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8081/realms/master/.well-known/openid-configuration >/dev/null || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 10
+    restart: unless-stopped
 
   postgres:
     image: postgres:15-alpine
@@ -184,10 +175,11 @@ services:
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL","pg_isready -U appuser -d appdb -h localhost"]
+      test: ["CMD-SHELL", "pg_isready -U appuser -d appdb -h 127.0.0.1"]
       interval: 5s
       timeout: 3s
       retries: 12
+    restart: unless-stopped
 
   redis:
     image: redis:7-alpine
@@ -200,6 +192,7 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+    restart: unless-stopped
 
   redis-commander:
     image: rediscommander/redis-commander:latest
@@ -215,11 +208,11 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   mongodb:
     image: mongo:6.0
     container_name: mongodb
-    restart: always
     ports:
       - "27017:27017"
     environment:
@@ -229,31 +222,33 @@ services:
     volumes:
       - ./data/mongodb:/data/db
     healthcheck:
-      test: ["CMD-SHELL", "echo 'db.stats().ok' | mongosh --quiet -u mongoadmin -p mongopass --authenticationDatabase admin"]
+      test: ["CMD-SHELL", "echo 'db.stats().ok' | mongosh --quiet -u mongoadmin -p mongopass --authenticationDatabase admin || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
+
   mongo-express:
     image: mongo-express:latest
     container_name: mongo-express
     restart: always
     ports:
-      - "8085:8081"   # http://localhost:8085
+      - "8085:8081"
     environment:
-      ME_CONFIG_MONGODB_SERVER: mongodb
-      ME_CONFIG_MONGODB_ADMINUSERNAME: mongoadmin
-      ME_CONFIG_MONGODB_ADMINPASSWORD: mongopass
+      # ⬇️ use URL em vez de *_SERVER/PORT
+      ME_CONFIG_MONGODB_URL: "mongodb://mongoadmin:mongopass@mongodb:27017/?authSource=admin"
+      # (opcionais) basic auth da UI:
       ME_CONFIG_BASICAUTH_USERNAME: admin
       ME_CONFIG_BASICAUTH_PASSWORD: admin
     depends_on:
-      - mongodb
+      mongodb:
+        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:8081 || exit 1"]
       interval: 10s
       timeout: 5s
-      retries: 5      
-
-# === Build secrets (Maven credenciais via env) ===
+      retries: 5
+      
 secrets:
   gh_user:
     environment: MAVEN_USERNAME
