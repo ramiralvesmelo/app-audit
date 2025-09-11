@@ -87,7 +87,9 @@ RUN addgroup --system app && adduser --system --ingroup app app
 # Se houver mais de um JAR no target, fixe <finalName> no POM
 COPY --from=build /app/target/*.jar /app/app.jar
 
-EXPOSE 8080
+# Perfil do Spring para usar application-docker.properties
+ENV SPRING_PROFILES_ACTIVE=docker
+# opcional: JVM flags
 ENV JAVA_OPTS=""
 USER app
 
