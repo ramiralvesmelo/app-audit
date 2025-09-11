@@ -53,3 +53,6 @@ infra/keycloak/realms/h2/
 infra/keycloak/realms/import/
 infra/keycloak/realms/transaction-logs/
 !infra/keycloak/realms/*.json
+
+### MongoDB ###
+infra/mongodb/**

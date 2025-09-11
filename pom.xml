@@ -173,6 +173,25 @@
 			<artifactId>jackson-databind</artifactId>
 		</dependency>
 
+		<!-- MongoDB -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-mongodb</artifactId>
+		</dependency>
+
+		<!-- Testcontainers para MongoDB -->
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>mongodb</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- Swagger UI / OpenAPI (SpringDoc v2 para Spring Boot 3) -->
 		<dependency>
 			<groupId>org.springdoc</groupId>

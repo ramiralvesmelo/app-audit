@@ -20,7 +20,7 @@ class ApplicationTests {
 
 
 	@MockitoBean
-	br.com.ramiralvesmelo.audit.message.consumer.OrderEventConsumer orderEventConsumer;
+	br.com.ramiralvesmelo.audit.message.consumer.LogEventConsumer orderEventConsumer;
 
 	@Autowired
 	private ApplicationContext context;

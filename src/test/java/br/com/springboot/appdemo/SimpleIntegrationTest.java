@@ -27,7 +27,7 @@ import br.com.ramiralvesmelo.audit.Application;
 public class SimpleIntegrationTest {
 
 	@MockitoBean
-    br.com.ramiralvesmelo.audit.message.consumer.OrderEventConsumer orderEventConsumer;	
+    br.com.ramiralvesmelo.audit.message.consumer.LogEventConsumer orderEventConsumer;	
 
     @Test
     public void contextLoads() {
