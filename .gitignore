@@ -43,16 +43,5 @@ bin/
 /bugs-technical-details.md
 /target/
 
-### Docker ###
-# POSTGRES
-/infra/docker/data/postgres/** 
-
-### KeyCloak ###
-infra/keycloak/data/
-infra/keycloak/realms/h2/
-infra/keycloak/realms/import/
-infra/keycloak/realms/transaction-logs/
-!infra/keycloak/realms/*.json
-
-### MongoDB ###
-infra/mongodb/**
+### Docker Datas ###
+/infra/docker/data
