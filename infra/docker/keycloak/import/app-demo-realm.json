@@ -1,9 +1,9 @@
 {
-  "realm": "app-demo",
+  "realm": "app-api-realm",
   "enabled": true,
   "clients": [
     {
-      "clientId": "app-demo-api",
+      "clientId": "app-api",
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": true,
@@ -19,18 +19,18 @@
     "realm": [
       {
         "name": "ADMIN",
-        "description": "Admin role for app-demo API"
+        "description": "Admin role for app-api API"
       }
     ]
   },
   "users": [
     {
-      "username": "appdemo",
+      "username": "appapi",
       "enabled": true,
       "emailVerified": true,
       "firstName": "App",
-      "lastName": "Demo",
-      "email": "appdemo@example.com",
+      "lastName": "Api",
+      "email": "appapi@example.com",
       "credentials": [
         {
           "type": "password",
