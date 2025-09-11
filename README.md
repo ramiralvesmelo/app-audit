@@ -171,9 +171,9 @@ $TOKEN | docker login ghcr.io -u ramiralvesmelo --password-stdin
 docker compose -f infra/docker/docker-compose.yml up -d --build
 ```
 
-### Subir os serviços: Kafka + KafkaUI + Zookeeper + Keycloak + PostgreSQL + Redis + Redis Commmander
+### Subir os serviços: Kafka + KafkaUI + Zookeeper + Keycloak + PostgreSQL + Redis + Redis Commmander + MongoDB + Mongo Express
 ```bash
-docker compose -f infra/docker/docker-compose.yml up -d app-demo zookeeper kafka keycloak redis postgres kafka-ui redis-commander
+docker compose -f infra/docker/docker-compose.yml up -d zookeeper kafka keycloak redis postgres kafka-ui redis-commander mongodb mongo-express
 ```
 
 ### Logs do serviço app-audit
