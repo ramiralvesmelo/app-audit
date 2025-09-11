@@ -1,15 +1,17 @@
 version: "3.9"
 
 services:
-  app-demo:
-    image: ramiralvesmelo/app-demo:latest
+  app-api:
+    #image: app-api:1.0.0
+    #image: ghcr.io/ramiralvesmelo/app-api
+    image: ramiralvesmelo/app-api
     build:
       context: ../..                 # <-- dois níveis acima (pom.xml)
       dockerfile: infra/docker/Dockerfile
       secrets:
         - gh_user
         - gh_pat
-    container_name: app-demo
+    container_name: app-api
     ports:
       - "8080:8080"
     environment:
@@ -18,7 +20,7 @@ services:
       SERVER_PORT: "8080"
 
       # Keycloak
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: "http://keycloak:8081/realms/app-demo"
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: "http://keycloak:8081/realms/app-api"
 
       # Banco de dados (PostgreSQL)
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/appdb
@@ -48,7 +50,9 @@ services:
       retries: 5
 
   app-audit:
-    image: app-audit:1.0.0
+    #image: app-audit:1.0.0
+    #image: ghcr.io/ramiralvesmelo/app-audit
+    image: ramiralvesmelo/app-audit
     build:
       context: ../..                 # <-- dois níveis acima (pom.xml)
       dockerfile: infra/docker/Dockerfile
@@ -64,7 +68,7 @@ services:
       SERVER_PORT: "8080"
 
       # Keycloak (habilite se o app exigir JWT)
-      # SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: "http://keycloak:8081/realms/app-demo"
+      # SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: "http://keycloak:8081/realms/app-api"
 
       # Kafka (consumo de eventos de auditoria)
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
