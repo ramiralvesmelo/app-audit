@@ -88,18 +88,23 @@ app-audit/
 
 # 🌐 URLs de Acesso
 
-| Serviço         | URL / Endereço                                                                 | Usuário | Senha   |
-| --------------- | ------------------------------------------------------------------------------ | ------- | ------- |
-| **app-audit**    | [http://localhost:8080](http://localhost:8080)                                 | -       | -       |
-| **Swagger UI**  | [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) | -       | -       |
-| **Keycloak**    | [http://keycloak:8081](http://keycloak:8081)                                   | admin   | admin   |
-| **Healthcheck** | [http://keycloak:8080/actuator/health](http://keycloak:8080/actuator/health)   | -       | -       |
-| **PostgreSQL**  | `jdbc:postgresql://localhost:5432/appdb`                                       | appuser | apppass |
-| **H2**          | `jdbc:h2:mem:testdb`                                                           | sa      | -       |
-| **H2 Console**  | [/h2-console](http://localhost:8080/h2-console)                                | sa      | -       |
-| **Redis**       | `localhost:6379`                                                               | -       | -       |
-| **Redis UI**    | [http://localhost:8082](http://localhost:8082)                                 | -       | -       |
-| **Kafka UI**    | [http://localhost:8083/ui/](http://localhost:8083/ui/)                         | -       | -       |
+| Serviço           | URL / Endereço                                                                 | Usuário    | Senha     |
+| ----------------- | ------------------------------------------------------------------------------ | ---------- | --------- |
+| **App-demo**      | [http://localhost:8080](http://localhost:8080)                                 | -          | -         |
+| **Swagger UI**    | [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) | -          | -         |
+| **App-audit**     | [http://localhost:8084](http://localhost:8084)                                 | -          | -         |
+| **Keycloak**      | [http://localhost:8081](http://localhost:8081)                                 | admin      | admin     |
+| **Healthcheck**   | [http://localhost:8080/actuator/health](http://localhost:8080/actuator/health) | -          | -         |
+| **PostgreSQL**    | `jdbc:postgresql://localhost:5432/appdb`                                       | appuser    | apppass   |
+| **H2**            | `jdbc:h2:mem:testdb`                                                           | sa         | -         |
+| **H2 Console**    | [/h2-console](http://localhost:8080/h2-console)                                | sa         | -         |
+| **Redis**         | `localhost:6379`                                                               | -          | -         |
+| **Redis UI**      | [http://localhost:8082](http://localhost:8082)                                 | admin      | admin     |
+| **Kafka**         | `localhost:9092`                                                               | -          | -         |
+| **Kafka UI**      | [http://localhost:8083/ui/](http://localhost:8083/ui/)                         | -          | -         |
+| **MongoDB**       | `mongodb://mongoadmin:mongopass@localhost:27017/auditdb?authSource=admin`      | mongoadmin | mongopass |
+| **Mongo Express** | [http://localhost:8085](http://localhost:8085)                                 | admin      | admin     |
+| **Zookeeper**     | `localhost:2181`                                                               | -          | -         |
 
 ---
 
