@@ -45,4 +45,3 @@ bin/
 
 ### Docker Datas ###
 /infra/docker/data
-/infra/docker/data/h2
