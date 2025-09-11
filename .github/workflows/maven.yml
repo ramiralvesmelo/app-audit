@@ -210,7 +210,7 @@ jobs:
           ls -l "${{ steps.prep-settings.outputs.path }}"
           sed 's|\(<password>\).*\(</password>\)|\1***\2|' "${{ steps.prep-settings.outputs.path }}" | head -n 20
 
-      - name: "🐳 Build & Push (GHCR)"
+      - name: "🐳 Build & Push (GHCR & Docker Hub)"
         uses: docker/build-push-action@v6
         with:
           context: ${{ env.PROJECT_DIR }}
