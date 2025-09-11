@@ -1,4 +1,4 @@
-package br.com.springboot.appdemo;
+package br.com.ramiralvesmelo.audit;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,4 +1,4 @@
-package br.com.springboot.appdemo;
+package br.com.ramiralvesmelo.audit;
 
 import java.time.Instant;
 import java.util.Map;
