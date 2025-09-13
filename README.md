@@ -1,21 +1,21 @@
 # 📘 App Audit
 
-[![Build Status](https://github.com/ramiralvesmelo/app-audit/actions/workflows/maven.yml/badge.svg)](https://github.com/ramiralvesmelo/app-audit/actions/workflows/maven.yml)
+[![Build Status](https://github.com/ramiralvesmelo/app-event/actions/workflows/maven.yml/badge.svg)](https://github.com/ramiralvesmelo/app-event/actions/workflows/maven.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/org.springframework.boot/spring-boot-starter.svg?logo=apache-maven)](https://search.maven.org/artifact/org.springframework.boot/spring-boot-starter)
 [![Java](https://img.shields.io/badge/Java-21-blue.svg?logo=java)](https://adoptium.net/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.5-brightgreen.svg?logo=springboot)](https://spring.io/projects/spring-boot)
-[![Coverage Status](https://img.shields.io/codecov/c/github/ramiralvesmelo/app-audit?logo=codecov)](https://app.codecov.io/gh/ramiralvesmelo/app-audit)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ramiralvesmelo_app-audit\&metric=alert_status)](https://sonarcloud.io/dashboard?id=ramiralvesmelo_app-audit)
-[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=ramiralvesmelo_app-audit\&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=ramiralvesmelo_app-audit)
-[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=ramiralvesmelo_app-audit\&metric=security_rating)](https://sonarcloud.io/dashboard?id=ramiralvesmelo_app-audit)
-[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=ramiralvesmelo_app-audit\&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=ramiralvesmelo_app-audit)
+[![Coverage Status](https://img.shields.io/codecov/c/github/ramiralvesmelo/app-event?logo=codecov)](https://app.codecov.io/gh/ramiralvesmelo/app-event)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ramiralvesmelo_app-event\&metric=alert_status)](https://sonarcloud.io/dashboard?id=ramiralvesmelo_app-event)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=ramiralvesmelo_app-event\&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=ramiralvesmelo_app-event)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=ramiralvesmelo_app-event\&metric=security_rating)](https://sonarcloud.io/dashboard?id=ramiralvesmelo_app-event)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=ramiralvesmelo_app-event\&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=ramiralvesmelo_app-event)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
 
 ![Integração do App Audit](infra/img/app-demo-integration.drawio.png)
 
-O **app-audit** é uma aplicação de demonstração que simula um sistema **ERP (Enterprise Resource Planning)** em pequena escala, com módulos de:
+O **app-event** é uma aplicação de demonstração que simula um sistema **ERP (Enterprise Resource Planning)** em pequena escala, com módulos de:
 
 * Cadastro de clientes
 * Produtos e estoque
@@ -30,7 +30,7 @@ Objetivo: servir como **estudo de caso prático**, aplicando boas práticas de a
 ## 🗂️ Estrutura do Projeto
 
 ```text
-app-audit/
+app-event/
 ├── .github/                               		# Configurações do GitHub
 │   └── workflows/                         		# Actions (CI)
 │       └── maven.yml                      		# Pipeline Maven (build, testes, etc.)
@@ -39,12 +39,12 @@ app-audit/
 │   │   ├── docker-compose.yml             		# Subir app + dependências (Postgres, Kafka, Redis, Keycloak)
 │   │   └── Dockerfile                     		# Imagem da aplicação (JDK 21)
 │   ├── insonia/                           		# Coleções do Insomnia
-│   │   └── app-audit-collection.yaml       		# Requests prontos (inclui auth)
+│   │   └── app-event-collection.yaml       		# Requests prontos (inclui auth)
 │   ├── jmeter/                            		# Testes de carga/performance
 │   │   └── post-customers-10000-random.jmx		# Script exemplo JMeter
 │   └── keycloak/                          		# Realm e dados do Keycloak
 │       └── realms/		
-│           ├── app-audit-realm.json        		# Realm com clients/roles/flows iniciais
+│           ├── app-event-realm.json        		# Realm com clients/roles/flows iniciais
 │           └── h2/                        		# Base H2 do Keycloak (modo DEV)
 ├── src/
 │   ├── main/
@@ -92,7 +92,7 @@ app-audit/
 | ----------------- | ------------------------------------------------------------------------------ | ---------- | --------- |
 | **App-demo**      | [http://localhost:8080](http://localhost:8080)                                 | -          | -         |
 | **Swagger UI**    | [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) | -          | -         |
-| **App-audit**     | [http://localhost:8084](http://localhost:8084)                                 | -          | -         |
+| **app-event**     | [http://localhost:8084](http://localhost:8084)                                 | -          | -         |
 | **Keycloak**      | [http://localhost:8081](http://localhost:8081)                                 | admin      | admin     |
 | **Healthcheck**   | [http://localhost:8080/actuator/health](http://localhost:8080/actuator/health) | -          | -         |
 | **PostgreSQL**    | `jdbc:postgresql://localhost:5432/appdb`                                       | appuser    | apppass   |
@@ -141,22 +141,22 @@ docker buildx build `
   -f infra/docker/Dockerfile `
   --secret id=gh_user,env=MAVEN_USERNAME `
   --secret id=gh_pat,env=MAVEN_PASSWORD `
-  -t app-audit:1.0.0 .
+  -t app-event:1.0.0 .
 
 # Executar container
-docker run --rm -p 8080:8080 app-audit:1.0.0
+docker run --rm -p 8080:8080 app-event:1.0.0
 
 # Executar com config externa (mapeando a pasta local para /config no container)
 docker run --rm -p 8080:8080 \
   -v $(pwd)/infra/docker/config:/config:ro \
   -e SPRING_CONFIG_LOCATION=file:/config/application.properties \
-  app-audit:1.0.0
+  app-event:1.0.0
 
 # Windows PowerShell (ajuste o caminho conforme seu projeto):
 docker run --rm -p 8080:8080 `
   -v ${PWD}\infra\docker\config:/config:ro `
   -e SPRING_CONFIG_LOCATION=file:/config/application.properties `
-  app-audit:1.0.0
+  app-event:1.0.0
 ```
 
 ---
@@ -178,12 +178,12 @@ docker compose -f infra/docker/docker-compose.yml up -d --build
 
 ### Subir os serviços: Kafka + KafkaUI + Zookeeper + Keycloak + PostgreSQL + Redis + Redis Commmander + MongoDB + Mongo Express
 ```bash
-docker compose -f infra/docker/docker-compose.yml up -d zookeeper kafka keycloak redis postgres kafka-ui redis-commander mongodb mongo-express
+docker compose -f infra/docker/docker-compose.yml up -d zookeeper kafka keycloak redis postgres kafka-ui redis-commander mongodb mongo-express minio
 ```
 
-### Logs do serviço app-audit
+### Logs do serviço app-event
 ```bash
-docker compose -f infra/docker/docker-compose.yml logs -f app-audit
+docker compose -f infra/docker/docker-compose.yml logs -f app-event
 ```
 
 ### Derrubar Todos os serviços
@@ -252,7 +252,7 @@ Para acessar o **Keycloak** pelo **nome do serviço** `keycloak` a partir do **h
 
 * **URL:** [http://keycloak:8080/actuator/health](http://keycloak:8080/actuator/health)
 
-> 💡 **Observação:** arquivo `app-audit-realm.json` contém as configurações iniciais do realm.
+> 💡 **Observação:** arquivo `app-event-realm.json` contém as configurações iniciais do realm.
 
 ---
 
@@ -307,7 +307,7 @@ Este guia descreve como configurar um **Client** no Keycloak para utilizar o flu
 
 #### 🔧 Passo 1: Criar ou editar o Client
 
-1. Vá em **Clients → app-audit-api** (ou crie um novo com este Client ID).
+1. Vá em **Clients → app-event-api** (ou crie um novo com este Client ID).
 2. Configure:
 
    * **Client authentication**: **Off** (cliente público)
@@ -348,15 +348,15 @@ Na aba **Advanced settings**:
 ##### application.properties
 
 ```properties
-spring.security.oauth2.resourceserver.jwt.issuer-uri=http://localhost:8081/realms/app-audit
+spring.security.oauth2.resourceserver.jwt.issuer-uri=http://localhost:8081/realms/app-event
 
 # Swagger UI OAuth (springdoc)
-springdoc.swagger-ui.oauth.client-id=app-audit-api
+springdoc.swagger-ui.oauth.client-id=app-event-api
 springdoc.swagger-ui.oauth.use-pkce-with-authorization-code-grant=true
 springdoc.swagger-ui.oauth.scopes=openid,profile
 springdoc.swagger-ui.oauth2-redirect-url=http://localhost:8080/swagger-ui/oauth2-redirect.html
-springdoc.swagger-ui.oauth.authorization-url=http://localhost:8081/realms/app-audit/protocol/openid-connect/auth
-springdoc.swagger-ui.oauth.token-url=http://localhost:8081/realms/app-audit/protocol/openid-connect/token
+springdoc.swagger-ui.oauth.authorization-url=http://localhost:8081/realms/app-event/protocol/openid-connect/auth
+springdoc.swagger-ui.oauth.token-url=http://localhost:8081/realms/app-event/protocol/openid-connect/token
 ```
 
 
@@ -388,13 +388,13 @@ O guia abaixo mostra como:
 
 ---
 
-👉 [Baixar `app-audit-collection.yaml`](./infra/insonia/app-audit-collection.yaml)
+👉 [Baixar `app-event-collection.yaml`](./infra/insonia/app-event-collection.yaml)
 
 **Como importar:**
 
 1. Abra o **Postman** ou **Insomnia**
 2. Clique em **Import > File**
-3. Selecione o arquivo `app-audit-collection.yaml`
+3. Selecione o arquivo `app-event-collection.yaml`
 
 > 💡 Na **collection do Insonia** já existe a requisição pronta para obter o token.
 > O passo a passo manual abaixo é útil para entender e testar via **curl**.
@@ -405,11 +405,11 @@ O guia abaixo mostra como:
 
 ```sh
 export TOKEN=$(curl -s \
-  -d "client_id=app-audit-api" \
+  -d "client_id=app-event-api" \
   -d "username=appdemo" \
   -d "password=123" \
   -d "grant_type=password" \
-  http://keycloak:8081/realms/app-audit/protocol/openid-connect/token | jq -r .access_token)
+  http://keycloak:8081/realms/app-event/protocol/openid-connect/token | jq -r .access_token)
 
 echo $TOKEN
 
@@ -421,7 +421,7 @@ curl -s -H "Authorization: Bearer $TOKEN" http://keycloak:8080/api/products
 
 ```powershell
 $body = @{
-  client_id  = "app-audit-api"
+  client_id  = "app-event-api"
   username   = "appdemo"
   password   = "123"
   grant_type = "password"
@@ -432,7 +432,7 @@ $body = @{
 }
 
 $TOKEN = (Invoke-RestMethod -Method Post `
-  -Uri "http://keycloak:8081/realms/app-audit/protocol/openid-connect/token" `
+  -Uri "http://keycloak:8081/realms/app-event/protocol/openid-connect/token" `
   -ContentType "application/x-www-form-urlencoded" `
   -Body $body).access_token
 
