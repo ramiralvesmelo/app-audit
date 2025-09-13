@@ -1,4 +1,4 @@
-package br.com.springboot.appdemo.message.consumer;
+package br.com.ramiralvesmelo.event.message.consumer;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;

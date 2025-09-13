@@ -1,96 +1,148 @@
-package br.com.ramiralvesmelo.audit.service;
+package br.com.ramiralvesmelo.event.service;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.time.Duration;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
+import br.com.ramiralvesmelo.event.service.MinioService;
+import br.com.ramiralvesmelo.util.number.OrderNumberUtil;
+import io.minio.BucketExistsArgs;
+import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
 
-@Testcontainers
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest
 class MinioServiceTest {
-
-    // Sobe um MinIO real em Docker
-    // Use uma tag recente do MinIO
-    static final GenericContainer<?> MINIO =
-        new GenericContainer<>("minio/minio:RELEASE.2025-01-20T14-21-49Z") // ajuste se necessário
-            .withEnv("MINIO_ROOT_USER", "minioadmin")
-            .withEnv("MINIO_ROOT_PASSWORD", "minioadmin")
-            .withCommand("server", "/data") // modo single
-            .withExposedPorts(9000)
-            .waitingFor(Wait.forHttp("/minio/health/ready").forPort(9000));
-
-    @BeforeAll
-    static void beforeAll() {
-        MINIO.start();
-    }
-
-    @AfterAll
-    static void afterAll() {
-        MINIO.stop();
-    }
-
-    // Injeta dinamicamente as properties que sua MinioService usa
-    @DynamicPropertySource
-    static void registerProperties(DynamicPropertyRegistry registry) {
-        String endpoint = "http://" + MINIO.getHost() + ":" + MINIO.getMappedPort(9000);
-        registry.add("minio.url", () -> endpoint);
-        registry.add("minio.access-key", () -> "minioadmin");
-        registry.add("minio.secret-key", () -> "minioadmin");
-        registry.add("minio.bucket", () -> "test-bucket");
-    }
-
-    // Define um MinioClient específico para o teste (usando as props acima)
-    @TestConfiguration
-    static class MinioTestConfig {
-        @Bean
-        MinioClient minioClient(
-            @Value("${minio.url}") String url,
-            @Value("${minio.access-key}") String accessKey,
-            @Value("${minio.secret-key}") String secretKey
-        ) {
-            return MinioClient.builder()
-                .endpoint(url)
-                .credentials(accessKey, secretKey)
-                .build();
-        }
-    }
 
     @Autowired
     private MinioService minioService;
 
-    @Test
-    void shouldUploadAndDownloadPdf() throws Exception {
-        // PDF mínimo (Qualquer byte array serve; MinIO não valida conteúdo)
-        byte[] pdfBytes = "%PDF-1.4\n1 0 obj\n<<>>\nendobj\ntrailer\n<<>>\n%%EOF"
-                .getBytes(StandardCharsets.UTF_8);
-        String fileName = "teste.pdf";
+    @Autowired
+    private MinioClient minioClient;
 
-        try (ByteArrayInputStream in = new ByteArrayInputStream(pdfBytes)) {
-            minioService.uploadPdf(fileName, in, pdfBytes.length);
-        }
+    @Value("${minio.url}")
+    private String minioUrl;
 
-        try (InputStream downloaded = minioService.downloadPdf(fileName)) {
-            assertNotNull(downloaded, "InputStream do download não pode ser nulo");
-            byte[] got = downloaded.readAllBytes();
-            assertArrayEquals(pdfBytes, got, "O conteúdo baixado deve ser igual ao enviado");
+    @Value("${minio.bucket}")
+    private String bucket;
+
+    @BeforeAll
+    void beforeAll() throws Exception {
+        boolean ready = waitForMinioReady(minioUrl, Duration.ofSeconds(30));
+        assumeTrue(ready, () -> "MinIO não está pronto em " + minioUrl + " — docker compose up -d minio");
+
+        boolean exists = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
+        if (!exists) {
+            minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
         }
     }
+
+    @Test
+    void upload() throws Exception {
+        String name = OrderNumberUtil.generate();
+        byte[] v1 = "%PDF-1.4\n%v1\n%%EOF".getBytes();
+
+        try (InputStream in = new ByteArrayInputStream(v1)) {
+            minioService.uploadPdf(name, in, v1.length);
+        }
+        assertTrue(minioService.exists(name));
+
+        // limpeza
+        minioService.deletePdf(name);
+    }
+
+    @Test
+    void download() throws Exception {
+        String name = OrderNumberUtil.generate();
+        byte[] v1 = "%PDF-1.4\n%v1\n%%EOF".getBytes();
+
+        try (InputStream in = new ByteArrayInputStream(v1)) {
+            minioService.uploadPdf(name, in, v1.length);
+        }
+
+        try (InputStream got = minioService.downloadPdf(name)) {
+            assertArrayEquals(v1, got.readAllBytes());
+        }
+
+        // limpeza
+        minioService.deletePdf(name);
+    }
+
+    @Test
+    void replace() throws Exception {
+        String name = OrderNumberUtil.generate();
+        byte[] v1 = "%PDF-1.4\n%v1\n%%EOF".getBytes();
+        byte[] v2 = "%PDF-1.4\n%v2\n%%EOF".getBytes();
+
+        // upload inicial
+        try (InputStream in = new ByteArrayInputStream(v1)) {
+            minioService.uploadPdf(name, in, v1.length);
+        }
+        // update/overwrite
+        try (InputStream in = new ByteArrayInputStream(v2)) {
+            minioService.updatePdf(name, in, v2.length);
+        }
+        // valida
+        try (InputStream got = minioService.downloadPdf(name)) {
+            assertArrayEquals(v2, got.readAllBytes());
+        }
+
+        // limpeza
+        minioService.deletePdf(name);
+    }
+
+    @Test
+    void delete() throws Exception {
+        String name = OrderNumberUtil.generate();
+        byte[] v1 = "%PDF-1.4\n%v1\n%%EOF".getBytes();
+
+        try (InputStream in = new ByteArrayInputStream(v1)) {
+            minioService.uploadPdf(name, in, v1.length);
+        }
+        assertTrue(minioService.exists(name));
+
+        minioService.deletePdf(name);
+        assertFalse(minioService.exists(name));
+    }
+
+    // ===== helpers =====
+    private static boolean waitForMinioReady(String baseUrl, Duration timeout) {
+        long deadline = System.nanoTime() + timeout.toNanos();
+        String health = baseUrl.replaceAll("/+$", "") + "/minio/health/ready";
+        while (System.nanoTime() < deadline) {
+            if (checkHealth(health)) return true;
+            try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
+        }
+        return false;
+    }
+
+    private static boolean checkHealth(String urlStr) {
+        try {
+            HttpURLConnection c = (HttpURLConnection) URI.create(urlStr).toURL().openConnection();
+            c.setConnectTimeout(2000);
+            c.setReadTimeout(2000);
+            c.setRequestMethod("GET");
+            int code = c.getResponseCode();
+            c.disconnect();
+            return code >= 200 && code < 300;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+
 }

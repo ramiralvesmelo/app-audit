@@ -1,4 +1,4 @@
-package br.com.ramiralvesmelo.audit.message.consumer;
+package br.com.ramiralvesmelo.event.message.consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
@@ -14,8 +14,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import br.com.ramiralvesmelo.audit.document.AuditLogDoc;
-import br.com.ramiralvesmelo.audit.repository.AuditLogRepository;
+import br.com.ramiralvesmelo.event.document.AuditLogDoc;
+import br.com.ramiralvesmelo.event.message.consumer.OrderFinalizedEventConsumer;
+import br.com.ramiralvesmelo.event.repository.AuditLogRepository;
 import br.com.ramiralvesmelo.util.message.event.OrderFinalizedEvent;
 
 @ExtendWith(MockitoExtension.class)

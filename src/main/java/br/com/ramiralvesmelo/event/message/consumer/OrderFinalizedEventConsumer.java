@@ -1,12 +1,12 @@
-package br.com.ramiralvesmelo.audit.message.consumer;
+package br.com.ramiralvesmelo.event.message.consumer;
 
 import java.util.HashMap;
 
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
-import br.com.ramiralvesmelo.audit.document.AuditLogDoc;
-import br.com.ramiralvesmelo.audit.repository.AuditLogRepository;
+import br.com.ramiralvesmelo.event.document.AuditLogDoc;
+import br.com.ramiralvesmelo.event.repository.AuditLogRepository;
 import br.com.ramiralvesmelo.util.message.event.OrderFinalizedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -41,17 +41,17 @@ services:
       retries: 5
     restart: unless-stopped
 
-  app-audit:
-    # image: app-audit:1.0.0
-    # image: ghcr.io/ramiralvesmelo/app-audit
-    image: ramiralvesmelo/app-audit
+  app-event:
+    # image: app-event:1.0.0
+    # image: ghcr.io/ramiralvesmelo/app-event
+    image: ramiralvesmelo/app-event
     build:
       context: ../..
       dockerfile: infra/docker/Dockerfile
       secrets:
         - gh_user
         - gh_pat
-    container_name: app-audit
+    container_name: app-event
     ports:
       - "8084:8080"
     environment:
@@ -253,7 +253,7 @@ services:
       timeout: 5s
       retries: 5
   minio:
-    image: minio/minio:RELEASE.2025-01-20T14-21-49Z
+    image: minio/minio:latest
     container_name: minio
     command: server /data --console-address ":9001"
     ports:

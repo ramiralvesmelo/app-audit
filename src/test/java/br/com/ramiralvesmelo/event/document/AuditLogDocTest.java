@@ -1,4 +1,4 @@
-package br.com.ramiralvesmelo.audit.document;
+package br.com.ramiralvesmelo.event.document;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
+
+import br.com.ramiralvesmelo.event.document.AuditLogDoc;
 
 class AuditLogDocTest {
 

@@ -1,4 +1,4 @@
-package br.com.ramiralvesmelo.audit.config;
+package br.com.ramiralvesmelo.event.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

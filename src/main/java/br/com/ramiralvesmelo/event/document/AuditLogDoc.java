@@ -1,4 +1,4 @@
-package br.com.ramiralvesmelo.audit.document;
+package br.com.ramiralvesmelo.event.document;
 
 import java.util.Map;
 

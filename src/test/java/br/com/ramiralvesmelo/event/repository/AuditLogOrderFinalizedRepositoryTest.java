@@ -1,4 +1,4 @@
-package br.com.ramiralvesmelo.audit.repository;
+package br.com.ramiralvesmelo.event.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,7 +20,8 @@ import org.testcontainers.utility.DockerImageName;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import br.com.ramiralvesmelo.audit.document.AuditLogDoc;
+import br.com.ramiralvesmelo.event.document.AuditLogDoc;
+import br.com.ramiralvesmelo.event.repository.AuditLogRepository;
 import br.com.ramiralvesmelo.util.message.event.OrderFinalizedEvent;
 import br.com.ramiralvesmelo.util.message.event.OrderFinalizedEvent.ItemDto;
 

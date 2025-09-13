@@ -12,12 +12,12 @@
 	</parent>
 
 	<groupId>br.com.ramiralvesmelo</groupId>
-	<artifactId>audit</artifactId>
+	<artifactId>event</artifactId>
 	<version>1.0.0</version>
 	<packaging>jar</packaging>
-	<name>audit</name>
+	<name>event</name>
 	<description>
-		Sistema de auditoria em Spring Boot 3.5, que recebe eventos via Apache
+		Sistema de eventoria em Spring Boot 3.5, que recebe eventos via Apache
 		Kafka e persiste os registros em MongoDB.
 		Serve como base de estudos em mensageria, persistência NoSQL, APIs REST
 		e testes (JUnit/Mockito).
