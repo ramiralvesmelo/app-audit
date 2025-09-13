@@ -30,7 +30,7 @@ env:
 
   # Qualidade / Telemetria
   SONAR_ORG: ramiralvesmelo
-  SONAR_PROJECT_KEY: ramiralvesmelo_app-audit
+  SONAR_PROJECT_KEY: ramiralvesmelo_app-event
   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   # Inputs do dispatch (disponíveis globalmente)
@@ -41,7 +41,7 @@ env:
   DOCKERHUB_REGISTRY: docker.io
   DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
   DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-  DOCKERHUB_IMAGE: ramiralvesmelo/app-audit
+  DOCKERHUB_IMAGE: ramiralvesmelo/app-event
 
 jobs:
 
