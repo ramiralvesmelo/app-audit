@@ -206,6 +206,7 @@ jobs:
 
       - name: "👀 Conferir settings (mascarado)"
         shell: bash
+        # valida output path (steps.prep-settings.outputs.path) se recebeu o valor maven-settings.xml
         run: |
           ls -l "${{ steps.prep-settings.outputs.path }}"
           sed 's|\(<password>\).*\(</password>\)|\1***\2|' "${{ steps.prep-settings.outputs.path }}" | head -n 20
@@ -219,6 +220,7 @@ jobs:
           platforms: ${{ env.DOCKER_PLATFORMS }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          # enviar steps.prep-settings.outputs.path
           secret-files: |
             maven_settings=${{ steps.prep-settings.outputs.path }}
           secrets: |
